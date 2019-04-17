@@ -1,4 +1,4 @@
-# shinchoku-tairiku.saty
+# shinchoku-tairiku.satyh
 進捗大陸05で使用されたsatysfiファイル
 
 ## 主なファイル
