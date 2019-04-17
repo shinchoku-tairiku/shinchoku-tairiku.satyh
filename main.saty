@@ -1,0 +1,27 @@
+@import: shinchoku-tairiku
+
+% @import: yutopp/main
+% @import: no_maddo/main
+% @import: youxkei/main
+% @import: pocketberserker/main
+% @import: amutake/main
+% @import: halcat0x15a/main
+@import: ./sample
+@import: ./credit
+
+document (|
+  title = {いい感じのタイトル};
+  author = {進捗太郎};
+  show-title = true;
+  show-toc = true;
+|) '<
+  +shinchoku-example;
+  % +yutopp;
+  % +no-maddo;
+  % +youxkei;
+  % +pocketberserker;
+  % +amutake;
+  % +halcat0x15a;
+
+  +credit;
+>

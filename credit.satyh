@@ -1,0 +1,15 @@
+@import: shinchoku-tairiku
+
+let right-block ctx it =
+  line-break false false ctx (inline-fil ++ read-inline ctx it)
+
+let-block ctx +credit =
+  let ctx-items = ctx |> set-paragraph-margin 6pt 6pt in
+  block-skip 13cm +++
+    right-block (ctx |> set-font-size (get-font-size ctx *' 1.5)) {いい感じの本名} +++
+    right-block ctx-items {2019年吉日 初版 第1刷 発行} +++
+    right-block ctx-items {著者 : 進捗太郎} +++
+    right-block ctx-items {印刷 : 印刷所の名前} +++
+    right-block ctx-items {表紙写真 : あれば書く} +++
+    right-block ctx-items {表紙画像加工 : あれば書く} +++
+    right-block ctx-items {表紙フォント : あれば書く}
