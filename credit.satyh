@@ -1,15 +1,27 @@
 @import: shinchoku-tairiku
 
-let right-block ctx it =
-  line-break false false ctx (inline-fil ++ read-inline ctx it)
+let left-block ctx len it1 it2 =
+  let k = read-inline ctx it1 in
+  let v = read-inline ctx it2 ++ inline-fil in
+  let w = get-natural-width k in
+  let ib = k ++ inline-skip (len -' w) ++ v in
+  line-break false false ctx ib
+
+let block-in ctx k =
+  let pads = (2cm, 2cm, 0pt, 0pt) in
+  block-frame-breakable ctx pads VDecoSet.empty k
 
 let-block ctx +credit =
+  let ctx =
+    ctx |> Context.set-font Config.font-cjk-gothic
+  in
   let ctx-items = ctx |> set-paragraph-margin 6pt 6pt in
-  block-skip 13cm +++
-    right-block (ctx |> set-font-size (get-font-size ctx *' 1.5)) {いい感じの本名} +++
-    right-block ctx-items {2019年吉日 初版 第1刷 発行} +++
-    right-block ctx-items {著者 : 進捗太郎} +++
-    right-block ctx-items {印刷 : 印刷所の名前} +++
-    right-block ctx-items {表紙写真 : あれば書く} +++
-    right-block ctx-items {表紙画像加工 : あれば書く} +++
-    right-block ctx-items {表紙フォント : あれば書く}
+  let k ctx =
+    let len = 3cm in
+    left-block (ctx |> set-font-size (get-font-size ctx *' 1.8)) 5cm {進捗大陸06で使ったsatyhファイル} {} +++
+    left-block ctx-items 5cm {2019年9月22日公開} {} +++
+    left-block ctx-items len {著者} {\@yutopp, \@pocketberserker, \@amutake} +++
+    left-block ctx-items len {印刷} {印刷所の名前}
+  in
+  clear-page +++ %% 必要なければ消す
+  block-skip 18cm +++ block-in ctx k

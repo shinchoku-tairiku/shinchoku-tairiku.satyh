@@ -1,0 +1,71 @@
+@import: ../shinchoku-tairiku
+
+let bib-items = [
+  (`tairiku05`, BibBook
+    (|
+      title = {進捗大陸05};
+      author = {進捗大陸};
+      publisher = Some {\url(`https://shinchokutairiku.booth.pm/items/1309694`);};
+      year  = 2019;
+    |)
+  );
+  (`satysfi-book`, BibBook
+    (|
+      title = {The \SATySFi;book};
+      author = {Takashi Suwa};
+      publisher = None;
+      year  = 2018;
+    |)
+  );
+  (`kakenhi`, BibMisc
+    (|
+      title = Some {科研費LaTeX};
+      author = None;
+      howpublished = Some {\url(`http://osksn2.hep.sci.osaka-u.ac.jp/~taku/kakenhiLaTeX/`);};
+      year = None;
+      month = None;
+    |)
+  );
+]
+
+let-block +yutopp = '<
+  +chapter?*?:(bib-items){アセンブラをアセンブリで作ってみる}{\@yutopp}<
+    +p{
+      進捗大陸06は\SATySFi;で書かれました。
+      進捗大陸05\cite(`tairiku05`);も\SATySFi;で書かれました。
+      The \SATySFi;book\cite(`satysfi-book`);を非常に参考にしています。
+    }
+    +section{セクション}<
+      +p{
+        これはセクション
+      }
+      +subsection{サブセクション}<
+        +p{
+          これはサブセクション
+        }
+        +subsubsection{サブサブセクション}<
+          +p{
+            これはサブサブセクション
+          }
+        >
+      >
+    >
+    +section{ぞうの卵はおいしいぞう}<
+      +p{
+        ぞうの卵はおいしいぞう。\cite(`kakenhi`);ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。\footnote{ぞうの卵はおいしいぞう。}ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
+      }
+      +row{
+      | \minipage(0.4)<
+        +p{
+          ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
+        }
+      >
+      | \minipage(0.4)<
+        +p{
+          ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
+        }
+      >
+      |}
+    >
+  >
+>
