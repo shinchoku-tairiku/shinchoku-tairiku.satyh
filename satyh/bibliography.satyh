@@ -1,0 +1,112 @@
+@import: util
+@import: context
+@import: config
+
+type bib-item-article =
+  (|
+    author : inline-text;
+    title : inline-text;
+    journal : inline-text;
+    year : int;
+  |)
+
+type bib-item-book =
+  (|
+    title : inline-text;
+    author : inline-text;
+    publisher : inline-text option;
+    year : int;
+  |)
+
+type bib-item-misc =
+  (|
+    title : inline-text option;
+    author : inline-text option;
+    howpublished : inline-text option;
+    year : int option;
+    month : string option;
+  |)
+
+type bib-item =
+  | BibArticle of bib-item-article
+  | BibBook of bib-item-book
+  | BibMisc of bib-item-misc
+
+module Bibliography : sig
+
+  val make : context -> (string * bib-item) list -> block-boxes
+  direct \cite : [string] inline-cmd
+
+end = struct
+
+  let to-key label = `bib:` ^ label ^ `:num`
+
+  let-mutable bib-number-ref <- 0
+  let set-bib-number label =
+    let () = increment bib-number-ref in
+    register-cross-reference (to-key label) (arabic !bib-number-ref)
+  let get-bib-number label =
+    match get-cross-reference (to-key label) with
+    | None -> `?`
+    | Some n -> n
+
+  let-inline ctx \cite label =
+    let num = get-bib-number label in
+    let size = get-font-size ctx in
+    let ctx =
+      ctx
+      |> set-font-size (size *' 0.75)
+      |> set-manual-rising (size *' 0.35)
+    in
+    embed-string (`[` ^ num ^ `]`) |> read-inline ctx |> Util.link-to label
+
+  let-inline ctx \italic it =
+    let ctx = Context.set-latin-font Config.font-latin-italic ctx in
+    read-inline ctx it
+
+  let make-line ctx item =
+    let num-to-it n = arabic n |> embed-string in
+    let dotopt d opt = opt |> Option.map (fun it -> {#it;#d;}) |> Option.from {} in
+    let ctx-italic = Context.set-latin-font Config.font-latin-italic ctx in
+    match item with
+    | BibArticle r ->
+      let author = r#author in
+      let title = r#title in
+      let journal = r#journal in
+      let year = num-to-it r#year in
+      read-inline ctx {#author;. #title;, \italic{#journal;}. #year;.}
+    | BibBook r ->
+      let author = r#author in
+      let title = r#title in
+      let publisher = dotopt {,} r#publisher in
+      let year = num-to-it r#year in
+      read-inline ctx {#author;. \italic{#title;}. #publisher; #year;.}
+    | BibMisc r ->
+      let author = dotopt {.} r#author in
+      let title = dotopt {.} r#title in
+      let howpublished = dotopt {.} r#howpublished in
+      let year = Option.map num-to-it r#year |> dotopt {.} in
+      let month = Option.map embed-string r#month |> dotopt {.} in
+      read-inline ctx {#author; \italic{#title;} #howpublished; #month; #year;}
+
+  let make ctx items =
+    let () = bib-number-ref <- 0 in
+    let f bb (label, item) =
+      let () = set-bib-number label in
+      let ib-num =
+        `[` ^ arabic !bib-number-ref ^ `] `#
+        |> embed-string
+        |> read-inline ctx
+        |> Util.set-link label
+        |> (fun ib -> ib ++ inline-skip 4pt)
+      in
+      let ib-item = make-line ctx item ++ inline-fil in
+      let num-width = get-natural-width ib-num in
+      let ctx = set-paragraph-margin 12pt 12pt ctx in
+      let bb-item = block-frame-breakable ctx (20pt, 0pt, 0pt, 0pt) VDecoSet.empty (fun ctx -> line-break true true ctx (inline-skip (0pt -' num-width) ++ ib-num ++ ib-item)) in
+      % let bb-item = line-break true true ctx ib-item in
+      bb +++ bb-item
+    in
+    items |> List.fold-left f block-nil
+
+end

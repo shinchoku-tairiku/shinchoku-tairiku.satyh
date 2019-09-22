@@ -1,27 +1,22 @@
 @import: shinchoku-tairiku
 
-% @import: yutopp/main
-% @import: no_maddo/main
-% @import: youxkei/main
-% @import: pocketberserker/main
-% @import: amutake/main
-% @import: halcat0x15a/main
-@import: ./sample
+@import: yutopp/main
+@import: pocketberserker/main
+@import: amutake/main
 @import: ./credit
 
-document (|
-  title = {いい感じのタイトル};
-  author = {進捗太郎};
-  show-title = true;
-  show-toc = true;
-|) '<
-  +shinchoku-example;
-  % +yutopp;
-  % +no-maddo;
-  % +youxkei;
-  % +pocketberserker;
-  % +amutake;
-  % +halcat0x15a;
+document '<
+  +p{
+    サークル進捗大陸としての6冊目の本です。
+    今回は\@yutopp『アセンブラをアセンブリで作ってみる』、\@pocketberserker『作って覚えるコンピュテーション式』、\@amutake『\SATySFi;で技術同人誌を作ろう』の三本立てとなっています。
+  }
+  +p{
+    なお、本書の電子書籍版は数ヶ月後に無料配布を予定しております。予めご了承ください。
+  }
+> '<
+  +yutopp;
+  +amutake;
+  +pocketberserker;
 
   +credit;
 >

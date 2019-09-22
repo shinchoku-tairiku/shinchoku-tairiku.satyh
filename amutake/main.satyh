@@ -1,0 +1,6 @@
+@import: ../shinchoku-tairiku
+
+let-block +amutake = '<
+  +chapter{\SATySFi;で技術同人誌を作ろう}{\@amutake}<
+  >
+>

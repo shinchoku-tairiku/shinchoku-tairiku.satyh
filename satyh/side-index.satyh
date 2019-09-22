@@ -1,0 +1,52 @@
+@require: gr
+
+@import: config
+@import: context
+
+module SideIndex : sig
+
+  val make : context -> page-side -> int -> inline-boxes
+
+end = struct
+
+  let rect-width = 13mm
+  let rect-height = 25mm
+  let rect-round = 3mm
+  let rect-start = 35mm
+
+  let draw-rect left right top bottom =
+    fill (Color.gray 0.8) (Gr.rectangle-round rect-round (left, top) (right, bottom))
+
+  let draw-chapter ctx side num left right top bottom =
+    let ctx =
+      ctx
+      |> set-font-size Config.font-size-huge
+      |> Context.set-font Config.font-cjk-gothic-bold
+      |> set-text-color Color.white
+    in
+    let ib = read-inline ctx (embed-string (arabic num)) in
+    let (width, height, depth) = get-natural-metrics ib in
+    let origin =
+      match side with
+      | LeftSide -> (right -' 2mm -' width, top -' 14mm)
+      | RightSide -> (left +' 2mm, top -' 14mm)
+    in
+    draw-text origin ib
+
+  let make ctx side num =
+    if num == 0 then inline-nil else
+
+    let left =
+      match side with
+      | LeftSide -> 0pt -' rect-round
+      | RightSide -> Config.page-width -' (rect-width -' rect-round)
+    in
+    let right = left +' rect-width in
+    let top = Config.page-height -' (rect-start +' (rect-height *' float num)) in
+    let bottom = top -' rect-height in
+
+    let rect = draw-rect left right top bottom in
+    let chapter = draw-chapter ctx side num left right top bottom in
+    inline-graphics 0pt 0pt 0pt (fun _ -> [rect; chapter])
+
+end

@@ -1,0 +1,66 @@
+@import: util
+
+module Config : sig
+  %% size / position
+  val page-width    : length
+  val page-height   : length
+  val text-width    : length
+  val text-height   : length
+  val text-origin   : point
+  val header-width  : length
+  val header-origin : point
+  val footer-width  : length
+  val footer-origin : point
+  %% font
+  val font-latin-roman : font
+  val font-latin-bold  : font
+  val font-latin-italic : font
+  val font-cjk-mincho  : font
+  val font-cjk-mincho-bold : font
+  val font-cjk-gothic  : font
+  val font-cjk-gothic-bold : font
+  val font-mono : font
+  %% font size
+  val font-size-footnote : length
+  val font-size-small  : length
+  val font-size-normal : length
+  val font-size-large  : length
+  val font-size-huge   : length
+  val leading-space : length
+  val paragraph-margin-top : length
+  val paragraph-margin-bottom : length
+end = struct
+  %% B5正寸サイズ + 裁ち落とし
+  let page-width    = 188mm
+  let page-height   = 263mm
+  %% size / position
+  let page-width    = page-width
+  let page-height   = page-height
+  let text-width    = page-width *' 0.8
+  let text-height   = page-height *' 0.8
+  let text-origin   = (page-width *' 0.1, page-height *' 0.1)
+  let header-width  = page-width *' 0.88
+  let header-origin = (page-width *' 0.06, page-height *' 0.03)
+  let footer-width  = page-width *' 0.88
+  let footer-origin = (page-width *' 0.06, page-height *' 0.97)
+  %% font
+  let font-ratio-latin = 1.
+  let font-ratio-cjk   = 0.88
+  let font-latin-roman = (`Junicode`, font-ratio-latin, 0.)
+  let font-latin-bold  = (`Junicode-b`, font-ratio-latin, 0.)
+  let font-latin-italic = (`Junicode-it`, font-ratio-latin, 0.)
+  let font-cjk-mincho  = (`NotoSerifJP-Light`, font-ratio-cjk, 0.)
+  let font-cjk-mincho-bold = (`NotoSerifJP-Bold`, font-ratio-cjk, 0.)
+  let font-cjk-gothic  = (`NotoSansJP-Regular`, font-ratio-cjk, 0.)
+  let font-cjk-gothic-bold = (`NotoSansJP-Bold`, font-ratio-cjk, 0.)
+  let font-mono = (`lmmono`, font-ratio-latin, 0.)
+  %% font size
+  let font-size-footnote = 8pt
+  let font-size-small = 9pt
+  let font-size-normal = 10.5pt
+  let font-size-large = 12pt
+  let font-size-huge = 16pt
+  let leading-space = font-size-normal *' 1.4
+  let paragraph-margin-top = font-size-normal *' 0.7
+  let paragraph-margin-bottom = paragraph-margin-top
+end

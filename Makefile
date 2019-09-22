@@ -1,7 +1,19 @@
-IMAGE=amutake/satysfi:0.0.3-dev2019.03.10
+IMAGE=amutake/satysfi:nightly
 
-docker:
-	docker run --rm -v $$(pwd):/home/opam/satysfi ${IMAGE} satysfi main.saty
+docker: .satysfi/dist/fonts
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi main.saty
 
-main.pdf:
+block: .satysfi/dist/fonts
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi --debug-show-block-bbox --debug-show-block-space main.saty
+
+inline: .satysfi/dist/fonts
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi --debug-show-bbox --debug-show-space main.saty
+
+help: .satysfi/dist/fonts
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi -h
+
+.satysfi/dist/fonts:
+	./install-fonts.sh
+
+main.pdf: .satysfi/dist/fonts
 	satysfi main.saty
