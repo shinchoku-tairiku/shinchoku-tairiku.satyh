@@ -1,9 +1,6 @@
 # shinchoku-tairiku.satyh
 
-進捗大陸で使用された SATySFi ファイル
-
-- [進捗大陸06](../../tree/book06)
-- [進捗大陸05](../../tree/book05)
+進捗大陸06で使用された SATySFi ファイル
 
 ## 主なファイル
 
