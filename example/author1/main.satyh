@@ -1,9 +1,17 @@
-@import: ../shinchoku-tairiku
+@import: ../../shinchoku-tairiku
 
 let bib-items = [
   (`tairiku05`, BibBook
     (|
       title = {進捗大陸05};
+      author = {進捗大陸};
+      publisher = Some {\url(`https://shinchokutairiku.booth.pm/items/1309694`);};
+      year  = 2019;
+    |)
+  );
+  (`tairiku06`, BibBook
+    (|
+      title = {進捗大陸06};
       author = {進捗大陸};
       publisher = Some {\url(`https://shinchokutairiku.booth.pm/items/1309694`);};
       year  = 2019;
@@ -28,8 +36,8 @@ let bib-items = [
   );
 ]
 
-let-block +amutake = '<
-  +chapter?*?:(bib-items){\SATySFi;で技術同人誌を作ろう}{\@amutake}<
+let-block +author1 = '<
+  +chapter?*?:(bib-items){タイトルタイトル}{\@author1}<
     +p{
       進捗大陸06は\SATySFi;で書かれました。
       進捗大陸05\cite(`tairiku05`);も\SATySFi;で書かれました。
@@ -50,38 +58,6 @@ let-block +amutake = '<
         >
       >
     >
-    +section{ファイルの説明}<
-      +p{
-        ファイルの簡単な説明がコード\ref(`dir-structure`);にあります。
-      }
-      +code?:(`dir-structure`)(```
-.
-|-- LICENSE
-|-- Makefile
-|-- README.md
-|-- install-fonts.sh            # フォントをインストールするスクリプト
-|-- fonts.txt                   # インストールするフォントを書いておくファイル
-|-- main.saty                   # エントリポイント
-|-- shinchoku-tairiku.satyh     # satyh/ 以下をまとめて、document 型の値を作るモジュール
-|-- satyh
-|   |-- bibliography.satyh      # 参考文献を出力するやつ
-|   |-- captioned-box.satyh     # キャプション付きのなにか
-|   |-- command.satyh           # 他にあまり依存していない便利コマンド
-|   |-- config.satyh            # 設定ファイル (いたるところから参照されるのでモジュールにしてしまっている)
-|   |-- context.satyh           # テキスト文脈をいじる便利関数
-|   |-- itemize.satyh           # 標準ライブラリの itemize.satyh の幅をいじったファイル
-|   |-- side-index.satyh        # ページ横のインデックス
-|   |-- table-of-contents.satyh # 目次と見出し (ファイル分けたい)
-|   `-- util.satyh              # 便利関数 (satyg にすべきかも)
-|-- credit.satyh                # 奥付け
-|-- amutake
-|   `-- main.satyh
-|-- pocketberserker
-|   `-- main.satyh
-`-- yutopp
-    `-- main.satyh
-      ```){ディレクトリ構造}
-    >
     +section{ぞうの卵はおいしいぞう}<
       +p{
         ぞうの卵はおいしいぞう。\cite(`kakenhi`);ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。\footnote{ぞうの卵はおいしいぞう。}ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
@@ -91,7 +67,7 @@ let-block +amutake = '<
         +p{
           ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
         }
-        +figure?*?:(4cm)(`amutake/figure.pdf`){これは図です}
+        +figure?*?:(4cm)(`author1/figure.pdf`){これは図です}
         +p{
           ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。ぞうの卵はおいしいぞう。
         }

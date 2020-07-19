@@ -1,4 +1,4 @@
-@import: shinchoku-tairiku
+@import: ../shinchoku-tairiku
 
 let left-block ctx len it1 it2 =
   let k = read-inline ctx it1 in
@@ -18,9 +18,9 @@ let-block ctx +credit =
   let ctx-items = ctx |> set-paragraph-margin 6pt 6pt in
   let k ctx =
     let len = 3cm in
-    left-block (ctx |> set-font-size (get-font-size ctx *' 1.8)) 5cm {進捗大陸06で使ったsatyhファイル} {} +++
+    left-block (ctx |> set-font-size (get-font-size ctx *' 1.8)) 5cm {進捗大陸のクラスファイル} {} +++
     left-block ctx-items 5cm {2019年9月22日公開} {} +++
-    left-block ctx-items len {著者} {\@yutopp, \@pocketberserker, \@amutake} +++
+    left-block ctx-items len {著者} {進捗大陸} +++
     left-block ctx-items len {印刷} {印刷所の名前}
   in
   clear-page +++ %% 必要なければ消す

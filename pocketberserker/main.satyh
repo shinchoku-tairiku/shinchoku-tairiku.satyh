@@ -1,6 +1,0 @@
-@import: ../shinchoku-tairiku
-
-let-block +pocketberserker = '<
-  +chapter{作って覚えるコンピュテーション式}{\@pocketberserker}<
-  >
->

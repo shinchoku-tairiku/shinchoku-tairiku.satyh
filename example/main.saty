@@ -1,0 +1,18 @@
+@import: ../shinchoku-tairiku
+
+@import: author1/main
+@import: author2/main
+@import: author3/main
+@import: ./credit
+
+document '<
+  +p{
+    これはサークル進捗大陸で用いているクラスファイルの例です。
+  }
+> '<
+  +author1;
+  +author2;
+  +author3;
+
+  +credit;
+>

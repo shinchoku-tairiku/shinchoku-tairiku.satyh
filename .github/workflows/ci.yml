@@ -1,0 +1,12 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: amutake/satysfi:nightly
+    steps:
+      - uses: actions/checkout@v2
+      - run: example/install-fonts.sh
+      - run: satysfi -C example/.satysfi example/main.saty

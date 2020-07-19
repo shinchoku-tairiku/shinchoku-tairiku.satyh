@@ -1,6 +1,0 @@
-@import: ../shinchoku-tairiku
-
-let-block +yutopp = '<
-  +chapter{アセンブラをアセンブリで作ってみる}{\@yutopp}<
-  >
->
