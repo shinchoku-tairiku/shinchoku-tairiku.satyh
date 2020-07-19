@@ -8,5 +8,5 @@ jobs:
       image: amutake/satysfi:nightly
     steps:
       - uses: actions/checkout@v2
-      - run: example/install-fonts.sh
-      - run: satysfi -C example/.satysfi example/main.saty
+      - run: apt-get update && apt-get install -y make wget
+      - run: make example-ci
