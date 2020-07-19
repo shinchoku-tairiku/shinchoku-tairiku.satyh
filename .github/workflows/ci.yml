@@ -8,5 +8,5 @@ jobs:
       image: amutake/satysfi:nightly
     steps:
       - uses: actions/checkout@v2
-      - run: apt-get update && apt-get install -y make wget
+      - run: apt-get update && apt-get install -y make wget unzip
       - run: make example-ci
