@@ -39,7 +39,7 @@ end = struct
     let label = Util.or-fresh-label None in
     let ibf num =
       let it-num = embed-string (arabic num) in
-      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Util.link-to label
+      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Util.link-to (Some (Color.rgb 0. 1. 0.)) label
     in
     let bbf num =
       let it-num = embed-string (arabic num) in
@@ -91,7 +91,7 @@ end = struct
     |> Option.from `?`
     |> embed-string
     |> read-inline ctx
-    |> Util.link-to label
+    |> Util.link-to (Some Color.red) label
 
   let-block ctx +p it =
     let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in

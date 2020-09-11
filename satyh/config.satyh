@@ -31,18 +31,22 @@ module Config : sig
   val paragraph-margin-bottom : length
 end = struct
   %% B5正寸サイズ + 裁ち落とし
-  let page-width    = 188mm
-  let page-height   = 263mm
+  let paper-page-width    = 188mm
+  let paper-page-height   = 263mm
+  %% 裁ち落とし
+  let page-cutoff         = 3mm
+  let ebook-page-width    = paper-page-width -' page-cutoff -' page-cutoff
+  let ebook-page-height   = paper-page-height -' page-cutoff -' page-cutoff
   %% size / position
-  let page-width    = page-width
-  let page-height   = page-height
-  let text-width    = page-width *' 0.8
-  let text-height   = page-height *' 0.8
-  let text-origin   = (page-width *' 0.1, page-height *' 0.1)
-  let header-width  = page-width *' 0.88
-  let header-origin = (page-width *' 0.06, page-height *' 0.03)
-  let footer-width  = page-width *' 0.88
-  let footer-origin = (page-width *' 0.06, page-height *' 0.97)
+  let page-width    = paper-page-width -' page-cutoff -' page-cutoff
+  let page-height   = paper-page-height -' page-cutoff -' page-cutoff
+  let text-width    = paper-page-width *' 0.8
+  let text-height   = paper-page-height *' 0.8
+  let text-origin   = ((page-width -' text-width) *' 0.5, (page-height -' text-height) *' 0.5)
+  let header-width  = paper-page-width *' 0.88
+  let header-origin = ((page-width -' header-width) *' 0.5, page-height *' 0.03)
+  let footer-width  = paper-page-width *' 0.88
+  let footer-origin = ((page-width -' footer-width) *' 0.5, page-height *' 0.97)
   %% font
   let font-ratio-latin = 1.
   let font-ratio-cjk   = 0.88

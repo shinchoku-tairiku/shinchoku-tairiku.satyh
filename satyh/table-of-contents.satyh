@@ -127,7 +127,7 @@ end = struct
         let width = get-text-width ctx -' get-natural-width ib-title -' get-natural-width ib-page in
         if width <' 0pt then inline-fil else make-dots-line ctx width
     in
-    let ib = Util.link-to label (ib-title ++ ib-middle ++ ib-page) in
+    let ib = Util.link-to None label (ib-title ++ ib-middle ++ ib-page) in
     line-break true true ctx ib
 
   let make-body ctx =

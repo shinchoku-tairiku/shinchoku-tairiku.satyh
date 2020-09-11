@@ -58,7 +58,7 @@ end = struct
       |> set-font-size (size *' 0.75)
       |> set-manual-rising (size *' 0.35)
     in
-    embed-string (`[` ^ num ^ `]`) |> read-inline ctx |> Util.link-to label
+    embed-string (`[` ^ num ^ `]`) |> read-inline ctx |> Util.link-to (Some Color.blue) label
 
   let-inline ctx \italic it =
     let ctx = Context.set-latin-font Config.font-latin-italic ctx in
