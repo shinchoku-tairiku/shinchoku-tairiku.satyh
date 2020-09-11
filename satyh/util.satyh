@@ -43,7 +43,7 @@ end = struct
     inline-graphics width margin-top margin-bottom stroke-line
 
   let link-to coloropt label ib =
-    let border = Option.map (fun c -> (0.5pt, c)) coloropt in
+    let border = Option.map (fun c -> (0.1pt, c)) coloropt in
     inline-frame-breakable (0pt, 0pt, 0pt, 0pt) (Annot.link-to-location-frame label border) ib
 
   let set-link label ib =
