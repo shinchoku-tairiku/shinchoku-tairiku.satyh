@@ -23,5 +23,4 @@
   (opam "satysfi-class-shinchoku-tairiku-doc.opam")
   (dependencies
     ((class-shinchoku-tairiku ())
-     (dist ())
     )))
