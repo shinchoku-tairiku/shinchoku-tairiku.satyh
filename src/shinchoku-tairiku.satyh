@@ -5,16 +5,16 @@
 @require: code
 @require: hdecoset
 
-@import: satyh/util
-@import: satyh/context
-@import: satyh/config
-@import: satyh/captioned-box
-@import: satyh/bibliography
-@import: satyh/table-of-contents
-@import: satyh/command
-@import: satyh/side-index
+@import: util
+@import: context
+@import: config
+@import: captioned-box
+@import: bibliography
+@import: table-of-contents
+@import: command
+@import: side-index
 
-@import: satyh/itemize
+@import: itemize
 
 module ShinchokuTairiku : sig
 
