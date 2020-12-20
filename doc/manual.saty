@@ -1,4 +1,4 @@
-@import: ../shinchoku-tairiku
+@require: class-shinchoku-tairiku/shinchoku-tairiku
 
 @import: author1/main
 @import: author2/main
