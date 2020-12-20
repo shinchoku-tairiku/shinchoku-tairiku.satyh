@@ -1,2 +1,0 @@
-NotoSansJP.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSansJP.zip
-NotoSerifJP.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSerifJP.zip
