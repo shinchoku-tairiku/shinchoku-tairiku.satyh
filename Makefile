@@ -11,8 +11,8 @@ doc: .satysfi
 
 doc-ci:
 	eval $$(opam env)
-	opam pin add ${PACKAGE} .
-	opam pin add ${PACKAGE}-doc . --deps-only
+	opam pin add . --no-action
+	opam install ${PACKAGE}-doc --deps-only
 	satysfi doc/manual.saty
 
 clean:
