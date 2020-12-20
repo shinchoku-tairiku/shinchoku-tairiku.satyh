@@ -1,0 +1,33 @@
+opam-version: "2.0"
+name: "satysfi-class-shinchoku-tairiku-doc"
+version: "0.0.0"
+synopsis: "Document of satysfi-class-shinchoku-tairiku"
+description: """
+Document of satysfi-class-shinchoku-tairiku
+"""
+maintainer: "Shinchoku Tairiku members <shinchoku.tairiku@gmail.com>"
+authors: "Shinchoku Tairiku members <shinchoku.tairiku@gmail.com>"
+license: "LGPL-3.0"
+homepage: "https://github.com/shinchoku-tairiku/satysfi-class-shinchoku-tairiku"
+dev-repo: "git+https://github.com/shinchoku-tairiku/satysfi-class-shinchoku-tairiku.git"
+bug-reports: "https://github.com/shinchoku-tairiku/satysfi-class-shinchoku-tairiku/issues"
+depends: [
+  "satysfi" { >= "0.0.5" & < "0.0.6" }
+  "satyrographos" { >= "0.0.2.6" & < "0.0.3" }
+
+  "satysfi-class-shinchoku-tairiku" {= "%{version}%"}
+
+  "satysfi-dist"
+]
+build: [
+  ["satyrographos" "opam" "build"
+   "--name" "class-shinchoku-tairiku-doc"
+   "--prefix" "%{prefix}%"
+   "--script" "%{build}%/Satyristes"]
+]
+install: [
+  ["satyrographos" "opam" "install"
+   "--name" "class-shinchoku-tairiku-doc"
+   "--prefix" "%{prefix}%"
+   "--script" "%{build}%/Satyristes"]
+]
