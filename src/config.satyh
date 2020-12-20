@@ -49,10 +49,10 @@ end = struct
   let font-latin-roman = (`Junicode`, font-ratio-latin, 0.)
   let font-latin-bold  = (`Junicode-b`, font-ratio-latin, 0.)
   let font-latin-italic = (`Junicode-it`, font-ratio-latin, 0.)
-  let font-cjk-mincho  = (`NotoSerifJP-Light`, font-ratio-cjk, 0.)
-  let font-cjk-mincho-bold = (`NotoSerifJP-Bold`, font-ratio-cjk, 0.)
-  let font-cjk-gothic  = (`NotoSansJP-Regular`, font-ratio-cjk, 0.)
-  let font-cjk-gothic-bold = (`NotoSansJP-Bold`, font-ratio-cjk, 0.)
+  let font-cjk-mincho  = (`fonts-noto-serif-cjk-jp:NotoSerifCJKjp-Light`, font-ratio-cjk, 0.)
+  let font-cjk-mincho-bold = (`fonts-noto-serif-cjk-jp:NotoSerifCJKjp-Bold`, font-ratio-cjk, 0.)
+  let font-cjk-gothic  = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Regular`, font-ratio-cjk, 0.)
+  let font-cjk-gothic-bold = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Bold`, font-ratio-cjk, 0.)
   let font-mono = (`lmmono`, font-ratio-latin, 0.)
   %% font size
   let font-size-footnote = 8pt
