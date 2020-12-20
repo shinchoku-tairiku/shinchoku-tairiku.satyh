@@ -12,6 +12,7 @@ doc: .satysfi
 doc-ci:
 	opam pin add . --no-action
 	opam install ${PACKAGE}-doc --deps-only
+	opam exec -- satyrographos install
 	opam exec -- satysfi doc/manual.saty
 
 clean:
