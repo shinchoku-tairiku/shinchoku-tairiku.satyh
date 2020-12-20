@@ -10,6 +10,7 @@ doc: .satysfi
 	docker run --rm -v $$(pwd):/satysfi ${IMAGE} sh -c "opam pin add ${PACKAGE} . && satyrographos install --output .satysfi/dist --copy"
 
 doc-ci:
+	eval $$(opam env)
 	opam pin add ${PACKAGE} .
 	opam pin add ${PACKAGE}-doc . --deps-only
 	satysfi doc/manual.saty
