@@ -1,0 +1,26 @@
+(version 0.0.2)
+
+(library
+  (name "class-shinchoku-tairiku")
+  (version "0.0.0")
+  (sources
+    ((packageDir "src")))
+  (opam "satysfi-class-shinchoku-tairiku.opam")
+  (dependencies
+    ((dist ())
+     (fonts-noto-sans-cjk-jp ())
+     (fonts-noto-serif-cjk-jp ())
+    )))
+
+(libraryDoc
+  (name "class-shinchoku-tairiku-doc")
+  (version "0.0.0")
+  (workingDirectory "doc")
+  (build
+    ((satysfi "manual.saty" "-o" "manual.pdf")))
+  (sources
+    ((doc "manual.pdf" "doc/manual.pdf")))
+  (opam "satysfi-class-shinchoku-tairiku-doc.opam")
+  (dependencies
+    ((class-shinchoku-tairiku ())
+    )))

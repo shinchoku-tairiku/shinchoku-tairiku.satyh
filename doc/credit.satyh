@@ -1,4 +1,4 @@
-@import: ../shinchoku-tairiku
+@require: class-shinchoku-tairiku/shinchoku-tairiku
 
 let left-block ctx len it1 it2 =
   let k = read-inline ctx it1 in

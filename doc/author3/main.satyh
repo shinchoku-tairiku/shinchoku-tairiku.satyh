@@ -1,4 +1,4 @@
-@import: ../../shinchoku-tairiku
+@require: class-shinchoku-tairiku/shinchoku-tairiku
 
 let-block +author3 = '<
   +chapter{タイトルタイトル}{\@author3}<

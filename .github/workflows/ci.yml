@@ -1,12 +1,19 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: amutake/satysfi:nightly
+      image: amutake/satysfi:opam-slim
     steps:
       - uses: actions/checkout@v2
-      - run: apt-get update && apt-get install -y make wget unzip
-      - run: make example-ci
+      - run: |
+          export HOME=/root
+          make doc-ci
