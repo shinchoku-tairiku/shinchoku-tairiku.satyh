@@ -1,12 +1,18 @@
-IMAGE=amutake/satysfi:nightly
+PACKAGE=satysfi-class-shinchoku-tairiku
+IMAGE=amutake/satysfi:opam-slim
 
-.PHONY: example
+.PHONY: doc doc-ci clean
 
-example: example/.satysfi/dist/fonts
-	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi -C example/.satysfi example/main.saty
+doc: .satysfi
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi doc/manual.saty
 
-example-ci: example/.satysfi/dist/fonts
-	satysfi -C example/.satysfi example/main.saty
+.satysfi:
+	docker run --rm -v $$(pwd):/satysfi ${IMAGE} sh -c "opam pin add ${PACKAGE} . && satyrographos install --output .satysfi/dist --copy"
 
-example/.satysfi/dist/fonts:
-	./example/install-fonts.sh
+doc-ci:
+	opam pin add ${PACKAGE} .
+	opam pin add ${PACKAGE}-doc . --deps-only
+	satysfi doc/manual.saty
+
+clean:
+	rm -rf .satysfi
