@@ -1,0 +1,24 @@
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+document '<> '<
+  +chapter{test}{test}<
+    +figure?:(`figure`)?:(5cm)(`figure.pdf`){figure caption}
+    +p{\ref(`figure`);}
+
+    +code?:(`code`)(```
+foo
+bar
+    ```){code caption}
+    +p{\ref(`code`);}
+
+    +table?:(`table`)([{|a|b|}; {|c|d|}]){table caption}
+    +p{\ref(`table`);}
+
+    +figure?:(`figure-1.2`)?:(5cm)(`figure.pdf`){figure caption}
+    +p{\ref(`figure-1.2`);}
+  >
+  +chapter{test}{test}<
+    +figure?:(`figure-2.1`)?:(5cm)(`figure.pdf`){figure caption}
+    +p{\ref(`figure-2.1`);}
+  >
+>
