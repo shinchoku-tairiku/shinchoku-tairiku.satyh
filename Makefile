@@ -15,5 +15,13 @@ doc-ci:
 	opam exec -- satyrographos install
 	opam exec -- satysfi doc/manual.saty
 
+test: test-build test-check
+
+test-build:
+	./test/build.sh
+
+test-check:
+	./test/check.sh
+
 clean:
-	rm -rf .satysfi
+	rm -rf .satysfi test/*_actual.pdf test/*_diff.pdf doc/manual.pdf **/*.satysfi-aux
