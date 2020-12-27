@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eu -o pipefail
+set -eu
 
 if ! type satysfi >/dev/null; then
   echo "satysfi command not found"

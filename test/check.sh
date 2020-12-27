@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -u -o pipefail
+set -u
 
 if ! type diff-pdf >/dev/null; then
   echo "diff-pdf command not found"
