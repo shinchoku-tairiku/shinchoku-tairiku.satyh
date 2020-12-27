@@ -7,12 +7,13 @@
 
 ## インストール
 
-opam でインストールできます。satyrographos-repo にはアップロードされていません。
+opam と Satyrographos でインストールできます。satyrographos-repo にはアップロードされていません。
 
 ```
 git clone git://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh
 cd shinchoku-tairiku.satyh
 opam pin add satysfi-class-shinchoku-tairiku .
+satyrographos install
 ```
 
 ## 使い方
@@ -47,47 +48,39 @@ document '<
 
 ## 開発方法
 
-事前に Docker をインストールしてください。
+以下を事前にインストールしてください。
+
+- `opam`
+- `opam` によってインストールされた `satysfi`
+- `opam` によってインストールされた `satyrographos`
+- (テストの実行のみ) [`diff-pdf`](https://github.com/vslavik/diff-pdf)
 
 ### クラスライブラリの開発
 
-`src/` 以下を編集し、以下のコマンドを実行してください。クラスライブラリおよびその依存パッケージが `.satysfi` ディレクトリにインストールされます。
+`src/` 以下を編集し、以下のコマンドを実行すると、更新されたクラスライブラリがインストールされます。
 
 ```
-make .satysfi
+make install
 ```
 
-その後は後述するマニュアルのビルドをして生成された PDF を確認してください。
+テストは `test` ディレクトリ以下にあります。以下のコマンドで実行できます。
 
-クラスライブラリを変更したあとは `make clean` して再度 `make .satysfi` を実行してください。
+```
+make test
+```
 
-### マニュアルの開発
+`build.sh` で各テストケースのビルド結果 (`${TESTCASE}_actual.pdf`) を生成し、`check.sh` で期待する内容 (`${TESTCASE}_expected.pdf`) と一致するかどうかを確認します。`build.sh` の実行には `satysfi` コマンドが、`check.sh` の実行には `diff-pdf` コマンドがそれぞれ必要です。`check.sh` によって `${TESTCASE}_actual.pdf` と `${TESTCASE}_expected.pdf` との差分 `${TESTCASE}_diff.pdf` が生成されます。
+
+何らかの変更によってテストケースが通らなくなったときは、`${TESTCASE}_actual.pdf` と `${TESTCASE}_diff.pdf` を確認して、問題なさそうであれば `update.sh ${TESTCASE}` を実行して期待する出力結果を更新します。
+
+
+### マニュアルの執筆
 
 `doc/` 以下を編集し、以下のコマンドでビルドします。結果が `doc/manual.pdf` に出力されます。
 
 ```
 make doc
 ```
-
-1回目はフォントのダウンロードなどがあるため時間がかかりますが、2回目以降はスキップされます。
-
-### テスト
-
-テストは `test` ディレクトリ以下にあります。
-
-```
-make test
-```
-
-で実行できます。実行には以下が必要です。
-
-- `satysfi-class-shinchoku-tairiku` のインストール
-- `satysfi` コマンド
-- `diff-pdf` コマンド
-
-`build.sh` で各テストケースの出力 (PDF) を取得し、`check.sh` で期待する結果と一致するかどうかを確認します。`build.sh` の実行には `satysfi` コマンドが、`check.sh` の実行には `diff-pdf` コマンドがそれぞれ必要です。
-
-何らかの変更によってテストケースが通らなくなったときは、`${TESTCASE}_actual.pdf` と `${TESTCASE}_diff.pdf` を確認して、問題なさそうであれば `update.sh ${TESTCASE}` を実行して期待する出力結果を更新します。
 
 ## 標準ライブラリをコピーして編集したもの
 
