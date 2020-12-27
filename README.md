@@ -1,5 +1,7 @@
 # shinchoku-tairiku.satyh
 
+![ci](https://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh/workflows/ci/badge.svg)
+
 進捗大陸で使用された SATySFi クラスライブラリ
 
 - [進捗大陸06](../../tree/book06)
