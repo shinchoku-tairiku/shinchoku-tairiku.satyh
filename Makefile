@@ -1,27 +1,32 @@
 PACKAGE=satysfi-class-shinchoku-tairiku
-IMAGE=amutake/satysfi:opam-slim
 
-.PHONY: doc doc-ci clean
+.PHONY: all
+all: install test doc
 
-doc: .satysfi
-	docker run --rm -v $$(pwd):/satysfi ${IMAGE} satysfi doc/manual.saty
+.PHONY: install
+install:
+	opam pin add ${PACKAGE}.dev "file://${PWD}" --yes --no-action
+	opam reinstall ${PACKAGE}.dev --yes
+	satyrographos install
 
-.satysfi:
-	docker run --rm -v $$(pwd):/satysfi ${IMAGE} sh -c "opam pin add ${PACKAGE} . && satyrographos install --output .satysfi/dist --copy"
+.PHONY: doc
+doc:
+	opam pin add ${PACKAGE}-doc.dev "file://${PWD}" --yes --no-action
+	opam install ${PACKAGE}-doc.dev --yes --deps-only
+	satyrographos install
+	satysfi doc/manual.saty
 
-doc-ci:
-	opam pin add . --no-action
-	opam install ${PACKAGE}-doc --deps-only
-	opam exec -- satyrographos install
-	opam exec -- satysfi doc/manual.saty
-
+.PHONY: test
 test: test-build test-check
 
+.PHONY: test-build
 test-build:
 	./test/build.sh
 
+.PHONY: test-build
 test-check:
 	./test/check.sh
 
+.PHONY: clean
 clean:
-	rm -rf .satysfi test/*_actual.pdf test/*_diff.pdf doc/manual.pdf **/*.satysfi-aux
+	rm -rf **/*.satysfi-aux test/*_{actual,diff}.pdf doc/manual.pdf
