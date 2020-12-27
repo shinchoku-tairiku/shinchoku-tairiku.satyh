@@ -1,0 +1,30 @@
+@require: standalone
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+standalone '<
+  +listing{
+  * a
+  ** b
+  * c
+  }
+  +p{
+    \listing{
+    * a
+    ** b
+    * c
+    }
+  }
+  % enumerate doesn't support nested items
+  +enumerate{
+  * a
+  * b
+  * c
+  }
+  +p{
+    \enumerate{
+    * a
+    * b
+    * c
+    }
+  }
+>
