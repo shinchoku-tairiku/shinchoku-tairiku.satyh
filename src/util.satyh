@@ -1,7 +1,5 @@
 @require: gr
 
-type font = string * float * float
-
 module Util : sig
 
   val draw-horizontal-line : length ?-> color ?-> length -> length -> length -> inline-boxes
