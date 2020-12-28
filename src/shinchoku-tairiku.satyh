@@ -30,8 +30,6 @@ module ShinchokuTairiku : sig
 
 end = struct
 
-  let make-footer = block-nil
-
   let page-shift pginfo (x, y) =
     let l = 3mm in
     match PageSide.of-page-number pginfo#page-number with
@@ -71,7 +69,7 @@ end = struct
       (|
         header-content = Header.scheme pbinfo#page-number;
         header-origin  = page-shift pbinfo Config.header-origin;
-        footer-content = make-footer;
+        footer-content = block-nil;
         footer-origin  = page-shift pbinfo Config.footer-origin;
       |)
     in
