@@ -2,6 +2,7 @@
 
 @import: config
 @import: context
+@import: page-side
 
 module SideIndex : sig
 
