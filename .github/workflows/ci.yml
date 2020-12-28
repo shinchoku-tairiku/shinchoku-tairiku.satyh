@@ -10,10 +10,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: amutake/satysfi:opam-slim
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          export HOME=/root
-          make doc-ci
+      - name: Build test files and the manual
+        run: |
+          docker run -v $(pwd):/satysfi amutake/satysfi:opam-slim sh -c \
+            "opam pin add . && satyrographos install && ./test/build.sh && satysfi doc/manual.saty"
+      - name: Check test files
+        id: check
+        run: |
+          docker run -v $(pwd):/satysfi -w /satysfi alpine:3.12 sh -c \
+            "apk add --no-cache diff-pdf && ./test/check.sh"
+      - name: Upload the manual
+        uses: actions/upload-artifact@v2
+        with:
+          name: manual
+          path: doc/manual.pdf
+      - name: Upload diff files if some tests have failed
+        uses: actions/upload-artifact@v2
+        if: failure() && steps.check.outcome == 'failure'
+        with:
+          name: diff
+          path: test/*_diff.pdf

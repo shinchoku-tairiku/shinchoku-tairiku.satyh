@@ -1,0 +1,10 @@
+@require: standalone
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+standalone '<
+  +p{\emph{abc}}
+  +p{footnote\footnote{footnote}footnote}
+  +p{\url(`https://example.com`);}
+  +p{\code(`code`);}
+  +p{line-break\line-break;line-break}
+>

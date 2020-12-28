@@ -1,0 +1,30 @@
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+let bib-items = [
+  (`book`, BibBook
+    (|
+      title = {book title};
+      author = {book author};
+      publisher = Some {\url(`https://example.com`);};
+      year  = 2020;
+    |)
+  );
+  (`misc`, BibMisc
+    (|
+      title = Some {misc title};
+      author = Some {misc author};
+      howpublished = Some {\url(`https://example.com`);};
+      year = Some 2020;
+      month = Some `Dec`;
+    |)
+  );
+] in
+
+document '<> '<
+  +chapter?*?:(bib-items){test}{test}<
+    +p{
+      \cite(`book`);
+      \cite(`misc`);
+    }
+  >
+>
