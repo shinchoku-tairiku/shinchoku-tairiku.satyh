@@ -1,0 +1,261 @@
+@import: config
+@import: context
+@import: event-listeners
+
+type 'n heading-changed-event = (|
+  label : string;
+  num : 'n;
+  title : inline-text;
+|)
+
+% こんなに情報いらないかもしれないが一応
+type 'n heading-page-fixed-event = (|
+  label : string;
+  num : 'n;
+  title : inline-text;
+  pbinfo : (| page-number : int |);
+|)
+
+module Headings : sig
+
+  val chapter-scheme : context -> string -> (string * bib-item) list -> inline-text -> inline-text -> block-text -> block-boxes
+  val section-scheme : context -> string -> inline-text -> block-text -> block-boxes
+  val subsection-scheme : context -> string -> inline-text -> block-text -> block-boxes
+  val subsubsection-scheme : context -> string -> inline-text -> block-text -> block-boxes
+
+  val add-chapter-changed-listener : (int heading-changed-event -> unit) -> unit
+  val add-section-changed-listener : ((int * int) heading-changed-event -> unit) -> unit
+
+  val add-chapter-page-fixed-listener : (int heading-page-fixed-event -> unit) -> unit
+  val add-section-page-fixed-listener : ((int * int) heading-page-fixed-event -> unit) -> unit
+
+end = struct
+
+  let-mutable chapter-num-ref <- 0
+  let-mutable section-num-ref <- 0
+  let-mutable subsection-num-ref <- 0
+
+  let chapter-changed-listeners = EventListeners.make ()
+  let section-changed-listeners = EventListeners.make ()
+
+  let chapter-page-fixed-listeners = EventListeners.make ()
+  let section-page-fixed-listeners = EventListeners.make ()
+
+  let add-chapter-changed-listener =
+    EventListeners.add chapter-changed-listeners
+  let add-section-changed-listener =
+    EventListeners.add section-changed-listeners
+
+  let add-chapter-page-fixed-listener =
+    EventListeners.add chapter-page-fixed-listeners
+  let add-section-page-fixed-listener =
+    EventListeners.add section-page-fixed-listeners
+
+  let dispatch-changed-event label num title listeners =
+    (|
+      label = label;
+      num = num;
+      title = title;
+    |)
+    |> EventListeners.dispatch listeners
+
+  let dispatch-page-fixed-event label num title pbinfo listeners =
+    (|
+      label = label;
+      num = num;
+      title = title;
+      pbinfo = pbinfo;
+    |)
+    |> EventListeners.dispatch listeners
+
+  %%
+  %% section
+  %%
+
+  let section-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size Config.font-size-huge
+
+  let section-scheme ctx label it-title bt-main =
+    %% reset nums
+    let () = increment section-num-ref in
+    let () = subsection-num-ref <- 0 in
+    %% num
+    let nums = (!chapter-num-ref, !section-num-ref) in
+    %% dispatch event
+    let () = dispatch-changed-event label nums it-title section-changed-listeners in
+    %% bb-title
+    let ctx-title = section-context ctx in
+    let s-num = arabic (!chapter-num-ref) ^ `.` ^ arabic (!section-num-ref) in
+    let it-num = embed-string s-num in
+    let page-hook pbinfo _ =
+      dispatch-page-fixed-event label nums it-title pbinfo section-page-fixed-listeners
+    in
+    let ib-title =
+      read-inline ctx-title it-num
+      ++ inline-skip 6pt
+      ++ read-inline ctx-title it-title
+      ++ hook-page-break page-hook
+    in
+    let bb-title =
+      Link.set label ib-title
+      |> line-break true false (ctx |> set-paragraph-margin 24pt 6pt)
+    in
+    let bb-line =
+      Graphics.draw-horizontal-line (get-text-width ctx) 0pt 0pt
+      |> line-break false false (ctx |> set-paragraph-margin 6pt 16pt)
+    in
+    %% main
+    let bb-main = read-block ctx bt-main in
+    %% finalize
+    bb-title +++ bb-line +++ bb-main
+
+  %%
+  %% subsection
+  %%
+
+  let subsection-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size Config.font-size-large
+    |> set-paragraph-margin 20pt 12pt
+
+  let subsection-scheme ctx label it-title bt-main =
+    %% reset nums
+    let () = increment subsection-num-ref in
+    %% num
+    let s-num =
+      arabic (!chapter-num-ref)
+      ^ `.`
+      ^ arabic (!section-num-ref)
+      ^ `.`
+      ^ arabic (!subsection-num-ref)
+    in
+    %% bb-title
+    let ctx-title = subsection-context ctx in
+    let it-num = embed-string s-num in
+    let page-hook pbinfo _ =
+      %% TODO: ref-page
+      ()
+    in
+    let ib-title =
+      read-inline ctx-title it-title
+      ++ hook-page-break page-hook
+    in
+    let bb-title =
+      Link.set label ib-title
+      |> line-break true false ctx-title
+    in
+    %% main
+    let bb-main = read-block ctx bt-main in
+    %% finalize
+    bb-title +++ bb-main
+
+  %%
+  %% subsubsection
+  %%
+
+  let subsubsection-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size Config.font-size-normal
+    |> set-paragraph-margin 18pt 10pt
+
+  let subsubsection-scheme ctx label it-title bt-main =
+    %% bb-title
+    let ctx-title = subsubsection-context ctx in
+    let page-hook pbinfo _ =
+      %% TODO: ref-page
+      ()
+    in
+    let ib-title =
+      read-inline ctx-title it-title
+      ++ hook-page-break page-hook
+    in
+    let bb-title =
+      Link.set label ib-title
+      |> line-break true false ctx-title
+    in
+    %% main
+    let bb-main = read-block ctx bt-main in
+    %% finalize
+    bb-title +++ bb-main
+
+  %%
+  %% chapter
+  %%
+  %% chapter は section-scheme を使う関係で section よりも後ろに置く必要がある
+
+  let chapter-num-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size 20pt
+
+  let chapter-title-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size 30pt
+
+  let chapter-quote-context ctx =
+    ctx
+
+  %% TODO: use satysfi-base's one
+  let-block ctx +eval-const bb = bb
+
+  let chapter-scheme ctx label bib-items it-title it-quote bt-main =
+    %% reset nums
+    let () = increment chapter-num-ref in
+    let () = section-num-ref <- 0 in
+    let () = subsection-num-ref <- 0 in
+    %% num
+    let num = !chapter-num-ref in
+    %% changed-event
+    let () = dispatch-changed-event label num it-title chapter-changed-listeners in
+    %% num
+    let s-num = arabic num in
+    let human-num = `第` ^ s-num ^ `章` in
+    let it-num = embed-string human-num in
+    let page-hook pbinfo _ =
+      dispatch-page-fixed-event label num it-title pbinfo chapter-page-fixed-listeners
+    in
+    let ctx-num = chapter-num-context ctx in
+    let ib-num =
+      read-inline ctx-num it-num
+      ++ hook-page-break page-hook
+    in
+    let bb-num = line-break true false ctx-num ib-num in
+    %% title
+    let ctx-title = chapter-title-context ctx in
+    let ib-title = read-inline ctx-title it-title in
+    let bb-title = line-break false false ctx-title ib-title in
+    %% quote
+    let ctx-quote = chapter-quote-context ctx in
+    let ib-quote = read-inline ctx-quote it-quote in
+    let bb-quote = line-break false false ctx-quote ib-quote in
+    %% main
+    let bb-main = read-block ctx bt-main in
+    %% bibliography
+    let bb-bib =
+      match bib-items with
+      | [] -> block-nil
+      | _ ->
+        let bib-label = Label.fresh () in
+        let bb-content = Bibliography.make ctx bib-items in
+        section-scheme ctx bib-label {参考文献} '<+eval-const(bb-content);>
+    in
+    %% finalize
+    [
+      clear-page;
+      block-skip 20pt;
+      bb-num;
+      block-skip 8pt;
+      bb-title;
+      block-skip 12pt;
+      bb-quote;
+      block-skip 28pt;
+      bb-main;
+      bb-bib;
+    ] |> List.fold-left (+++) block-nil
+
+end
