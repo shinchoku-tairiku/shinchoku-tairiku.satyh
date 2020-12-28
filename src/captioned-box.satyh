@@ -1,7 +1,6 @@
 @require: code
 @require: list
 
-@import: util
 @import: context
 @import: config
 @import: link

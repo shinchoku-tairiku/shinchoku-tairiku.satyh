@@ -1,6 +1,6 @@
 @require: gr
 
-module Util : sig
+module Graphics : sig
 
   val draw-horizontal-line : length ?-> color ?-> length -> length -> length -> inline-boxes
 

@@ -1,4 +1,4 @@
-@import: util
+@import: graphics
 @import: bibliography
 @import: link
 @import: label
@@ -199,7 +199,7 @@ end = struct
     in
     let bb-title = Link.set label ib-title |> line-break true false (ctx |> set-paragraph-margin 24pt 6pt) in
     let bb-line =
-      Util.draw-horizontal-line (get-text-width ctx) 0pt 0pt
+      Graphics.draw-horizontal-line (get-text-width ctx) 0pt 0pt
       |> line-break false false (ctx |> set-paragraph-margin 6pt 16pt)
     in
     let bb-main = k ctx in

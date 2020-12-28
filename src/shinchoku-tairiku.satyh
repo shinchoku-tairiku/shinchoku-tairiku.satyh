@@ -5,7 +5,7 @@
 @require: code
 @require: hdecoset
 
-@import: util
+@import: graphics
 @import: context
 @import: config
 @import: captioned-box
@@ -98,7 +98,7 @@ end = struct
     in
     let ctx-main = ctx |> set-paragraph-margin 0pt 5pt in
     let bb-main = line-break false false ctx-main ib-main in
-    let ib-line = inline-fil ++ Util.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
+    let ib-line = inline-fil ++ Graphics.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
     let ctx-line = ctx |> set-paragraph-margin 0pt 0pt in
     let bb-line = line-break false false ctx-line ib-line in
     bb-side-index +++ bb-main +++ bb-line
