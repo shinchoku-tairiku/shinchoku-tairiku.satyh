@@ -4,21 +4,9 @@ type font = string * float * float
 
 module Util : sig
 
-  val or-fresh-label : string option -> string
   val draw-horizontal-line : length ?-> color ?-> length -> length -> length -> inline-boxes
 
 end = struct
-
-  let or-fresh-label =
-    let-mutable count <- 0 in
-    let or opt =
-      match opt with
-      | None ->
-        let () = increment count in
-        `generated:` ^ arabic !count
-      | Some l -> l
-    in
-    or
 
   let draw-horizontal-line ?:topt ?:coloropt width margin-top margin-bottom =
     let t = Option.from 0.5pt topt in

@@ -37,7 +37,7 @@ end = struct
       |> set-font-size (size *' 0.75)
       |> set-manual-rising (size *' 0.35)
     in
-    let label = Util.or-fresh-label None in
+    let label = Label.or-fresh None in
     let ibf num =
       let it-num = embed-string (arabic num) in
       read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Link.to label
@@ -165,7 +165,7 @@ end = struct
       (ib-dfn ++ ib-word ++ inline-skip (get-font-size ctx) ++ ib-inner ++ inline-fil)
 
   let-block ctx +theorem ?:wordopt ?:labelopt inner =
-    let label = Util.or-fresh-label (Option.map (fun l -> `theorem:` ^ l) labelopt) in
+    let label = Label.or-fresh (Option.map (fun l -> `theorem:` ^ l) labelopt) in
     theorem-scheme ctx (Context.set-latin-font Config.font-latin-italic) {Theorem} wordopt label inner
 
   let-block ctx +proof ?:wordopt inner =

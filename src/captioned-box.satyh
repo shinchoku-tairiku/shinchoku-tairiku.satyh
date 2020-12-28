@@ -5,6 +5,7 @@
 @import: context
 @import: config
 @import: link
+@import: label
 
 module CaptionedBox : sig
 
@@ -23,7 +24,7 @@ end = struct
   let scheme ctx labelopt num-ref kind caption inner =
     let () = increment num-ref in
     let num = arabic !current-chapter-ref ^ `.` ^ arabic !num-ref in
-    let label = Util.or-fresh-label labelopt in
+    let label = Label.or-fresh labelopt in
     let () = register-cross-reference (label ^ `:num`) num in
     %% caption
     let it-num = embed-string num in

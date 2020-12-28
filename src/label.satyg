@@ -1,0 +1,18 @@
+module Label : sig
+
+  val or-fresh : string option -> string
+
+end = struct
+
+  let or-fresh =
+    let-mutable count <- 0 in
+    let or opt =
+      match opt with
+      | None ->
+        let () = increment count in
+        `generated:` ^ arabic !count
+      | Some l -> l
+    in
+    or
+
+end

@@ -1,6 +1,7 @@
 @import: util
 @import: bibliography
 @import: link
+@import: label
 
 module ShinchokuTairikuToc : sig
 
@@ -205,7 +206,7 @@ end = struct
     bb-title +++ bb-line +++ bb-main
 
   let-block ctx +section ?:labelopt it-title inner =
-    let label = Util.or-fresh-label labelopt in
+    let label = Label.or-fresh labelopt in
     let k ctx = read-block ctx inner in
     section-scheme ctx label it-title k
 
@@ -248,7 +249,7 @@ end = struct
       match bib-items with
       | [] -> block-nil
       | _ ->
-        let bib-label = Util.or-fresh-label None in
+        let bib-label = Label.or-fresh None in
         let k-bib ctx = Bibliography.make ctx bib-items in
         section-scheme ctx bib-label {参考文献} k-bib
     in
@@ -267,7 +268,7 @@ end = struct
     ] |> List.fold-left (+++) block-nil
 
   let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote inner =
-    let label = Util.or-fresh-label labelopt in
+    let label = Label.or-fresh labelopt in
     let bib-items = Option.from [] bib-itemsopt in
     let k ctx = read-block ctx inner in
     chapter-scheme ctx label bib-items it-title it-quote k
@@ -296,7 +297,7 @@ end = struct
     bb-title +++ bb-main
 
   let-block ctx +subsection ?:labelopt it-title inner =
-    let label = Util.or-fresh-label labelopt in
+    let label = Label.or-fresh labelopt in
     let k ctx = read-block ctx inner in
     subsection-scheme ctx label it-title k
 
