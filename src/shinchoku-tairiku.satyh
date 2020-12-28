@@ -22,19 +22,6 @@ module ShinchokuTairiku : sig
 
 end = struct
 
-  let get-default-context width =
-    get-initial-context width (command \math)
-    |> set-dominant-wide-script Kana
-    |> set-language Kana Japanese
-    |> set-language HanIdeographic Japanese
-    |> set-dominant-narrow-script Latin
-    |> set-language Latin English
-    |> Context.set-font Config.font-cjk-mincho
-    |> set-font-size Config.font-size-normal
-    |> set-leading Config.leading-space
-    |> set-min-paragraph-ascender-and-descender 0pt 0pt
-    |> set-paragraph-margin Config.paragraph-margin-top Config.paragraph-margin-bottom
-
   let make-preface ctx inner =
     let ctx-title =
       ctx
@@ -79,7 +66,7 @@ end = struct
     ++ read-inline ctx it-title
 
   let make-header pnum =
-    let ctx = get-default-context Config.header-width in
+    let ctx = Context.default Config.header-width in
     let side = PageSide.of-page-number pnum in
     let bb-side-index = make-side-index ctx side in
     let (chapter-pnum, chapter-num, _) = !current-chapter-ref in
@@ -113,7 +100,7 @@ end = struct
 
   let document preface inner =
     %% initial context
-    let ctx = get-default-context Config.text-width in
+    let ctx = Context.default Config.text-width in
     %% module settings
     let () = ShinchokuTairikuToc.register-chapter-hook CaptionedBox.set-chapter in
     let () = ShinchokuTairikuToc.register-page-chapter-hook set-current-chapter in
