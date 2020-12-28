@@ -1,5 +1,6 @@
 @import: context
 @import: config
+@import: link
 
 type align =
   | Start
@@ -39,14 +40,14 @@ end = struct
     let label = Util.or-fresh-label None in
     let ibf num =
       let it-num = embed-string (arabic num) in
-      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Util.link-to label
+      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Link.to label
     in
     let bbf num =
       let it-num = embed-string (arabic num) in
       let font-size = Config.font-size-footnote in
       let ib-symbol =
         inline-skip 14pt
-        ++ (read-inline (ctx-symbol font-size) {#symbol;#it-num;} |> Util.set-link label)
+        ++ (read-inline (ctx-symbol font-size) {#symbol;#it-num;} |> Link.set label)
         ++ inline-skip 3pt
       in
       let symbol-width = get-natural-width ib-symbol in
@@ -91,7 +92,7 @@ end = struct
     |> Option.from `?`
     |> embed-string
     |> read-inline ctx
-    |> Util.link-to label
+    |> Link.to label
 
   let-block ctx +p it =
     let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in

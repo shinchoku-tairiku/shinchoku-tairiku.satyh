@@ -1,6 +1,7 @@
 @import: util
 @import: context
 @import: config
+@import: link
 
 type bib-item-article =
   (|
@@ -58,7 +59,7 @@ end = struct
       |> set-font-size (size *' 0.75)
       |> set-manual-rising (size *' 0.35)
     in
-    embed-string (`[` ^ num ^ `]`) |> read-inline ctx |> Util.link-to label
+    embed-string (`[` ^ num ^ `]`) |> read-inline ctx |> Link.to label
 
   let-inline ctx \italic it =
     let ctx = Context.set-latin-font Config.font-latin-italic ctx in
@@ -97,7 +98,7 @@ end = struct
         `[` ^ arabic !bib-number-ref ^ `] `#
         |> embed-string
         |> read-inline ctx
-        |> Util.set-link label
+        |> Link.set label
         |> (fun ib -> ib ++ inline-skip 4pt)
       in
       let ib-item = make-line ctx item ++ inline-fil in

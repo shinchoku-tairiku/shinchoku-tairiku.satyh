@@ -4,6 +4,7 @@
 @import: util
 @import: context
 @import: config
+@import: link
 
 module CaptionedBox : sig
 
@@ -43,7 +44,7 @@ end = struct
       |> line-break false true ctx-caption
     in
 
-    inner +++ bb-caption |> Util.set-link-block ctx label
+    inner +++ bb-caption |> Link.set-block ctx label
 
   let-mutable figure-num-ref <- 0
   let-block ctx +figure ?:labelopt ?:widthopt path caption =
