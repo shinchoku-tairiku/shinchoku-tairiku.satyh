@@ -34,12 +34,12 @@ type bib-item =
 
 module Bibliography : sig
 
-  val make : context -> (label * bib-item) list -> block-boxes
-  direct \cite : [label] inline-cmd
+  val scheme : context -> (label * bib-item) list -> block-boxes
+  val cite-scheme : context -> label -> inline-boxes
 
 end = struct
 
-  let to-key label = `bib:` ^ label ^ `:num`
+  let to-key label = `shinchoku-tairiku:bib:` ^ label ^ `:num`
 
   let-mutable bib-number-ref <- 0
   let set-bib-number label =
@@ -50,7 +50,7 @@ end = struct
     | None -> `?`
     | Some n -> n
 
-  let-inline ctx \cite label =
+  let cite-scheme ctx label =
     let num = get-bib-number label in
     let size = get-font-size ctx in
     let ctx =
@@ -64,7 +64,7 @@ end = struct
     let ctx = Context.set-latin-font Config.font-latin-italic ctx in
     read-inline ctx it
 
-  let make-line ctx item =
+  let line-scheme ctx item =
     let num-to-it n = arabic n |> embed-string in
     let dotopt d opt = opt |> Option.map (fun it -> {#it;#d;}) |> Option.from {} in
     let ctx-italic = Context.set-latin-font Config.font-latin-italic ctx in
@@ -89,7 +89,8 @@ end = struct
       let month = Option.map embed-string r#month |> dotopt {.} in
       read-inline ctx {#author; \italic{#title;} #howpublished; #month; #year;}
 
-  let make ctx items =
+  let scheme ctx items =
+    %% reset num
     let () = bib-number-ref <- 0 in
     let f bb (label, item) =
       let () = set-bib-number label in
@@ -100,7 +101,7 @@ end = struct
         |> Link.set label
         |> (fun ib -> ib ++ inline-skip 4pt)
       in
-      let ib-item = make-line ctx item ++ inline-fil in
+      let ib-item = line-scheme ctx item ++ inline-fil in
       let num-width = get-natural-width ib-num in
       let ctx = set-paragraph-margin 12pt 12pt ctx in
       let bb-item = block-frame-breakable ctx (20pt, 0pt, 0pt, 0pt) VDecoSet.empty (fun ctx -> line-break true true ctx (inline-skip (0pt -' num-width) ++ ib-num ++ ib-item)) in

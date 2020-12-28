@@ -280,12 +280,13 @@ end = struct
     %% main
     let bb-main = read-block ctx bt-main in
     %% bibliography
+    %% TODO: bibliography の依存を切り離したい
     let bb-bib =
       match bib-items with
       | [] -> block-nil
       | _ ->
         let bib-label = Label.fresh () in
-        let bb-content = Bibliography.make ctx bib-items in
+        let bb-content = Bibliography.scheme ctx bib-items in
         section-scheme ctx bib-label {参考文献} '<+eval-const(bb-content);>
     in
     %% finalize
