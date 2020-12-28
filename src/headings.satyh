@@ -262,7 +262,10 @@ end = struct
     %% quote
     let ctx-quote = chapter-quote-context ctx in
     let ib-quote = read-inline ctx-quote it-quote in
-    let bb-quote = line-break false false ctx-quote ib-quote in
+    let bb-quote =
+      inline-fil ++ ib-quote
+      |> line-break false false ctx-quote
+    in
     %% main
     let bb-main = read-block ctx bt-main in
     %% bibliography
