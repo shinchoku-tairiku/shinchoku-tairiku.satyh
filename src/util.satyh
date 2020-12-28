@@ -3,16 +3,6 @@
 
 type font = string * float * float
 
-type page-side =
-  | LeftSide
-  | RightSide
-
-module PageSide : sig
-  val of-page-number : int -> page-side
-end = struct
-  let of-page-number pn = if pn mod 2 == 0 then LeftSide else RightSide
-end
-
 module Util : sig
 
   val or-fresh-label : string option -> string
