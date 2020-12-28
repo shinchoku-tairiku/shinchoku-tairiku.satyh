@@ -1,32 +1,34 @@
+@require: list
+
 module EventListeners : sig
 
   type 'a t
 
-  make : unit -> 'a t
+  val make : unit -> 'a t
 
   %% (unit -> unit) を返すようにしてキャンセルできるようにしてもいいが使う機会がないのでつけない
-  add : ('a -> unit) -> 'a t -> unit
+  val add : ('a -> unit) -> 'a t -> unit
 
-  clear : 'a t -> unit
+  val clear : 'a t -> unit
 
   %% 実行順は未定義
-  dispatch : 'a -> 'a t -> unit
+  val dispatch : 'a -> 'a t -> unit
 
 end = struct
 
-  type 'a t = (('a -> unit) list) ref
+  type 'a t = Listeners of (('a -> unit) list) ref
 
   let make () =
     let-mutable ls-ref <- [] in
-    ls-ref
+    Listeners ls-ref
 
-  let add l ls-ref =
+  let add l (Listeners ls-ref) =
     ls-ref <- l :: !ls-ref
 
-  let clear ls-ref =
+  let clear (Listeners ls-ref) =
     ls-ref <- []
 
-  let dispatch v ls-ref =
-    List.foreach (fun l -> l v) !ls-ref
+  let dispatch v (Listeners ls-ref) =
+    List.iter (fun l -> l v) !ls-ref
 
 end
