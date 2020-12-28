@@ -14,6 +14,7 @@
 @import: command
 @import: side-index
 @import: header
+@import: preface
 
 @import: itemize
 
@@ -22,20 +23,6 @@ module ShinchokuTairiku : sig
   val document : block-text -> block-text -> document
 
 end = struct
-
-  let make-preface ctx inner =
-    let ctx-title =
-      ctx
-      |> Context.set-font Config.font-cjk-gothic-bold
-      |> set-font-size 24pt
-      |> set-paragraph-margin 30pt 30pt
-    in
-    let bb-title =
-      inline-fil ++ read-inline ctx-title {はじめに}
-      |> line-break false false ctx-title
-    in
-    let bb-inner = read-block ctx inner in
-    bb-title +++ bb-inner +++ block-skip 30pt
 
   let make-footer = block-nil
 
@@ -57,7 +44,7 @@ end = struct
       Header.set-section num title pnum
     ) in
     %% -- preface --
-    let bb-preface = make-preface ctx preface in
+    let bb-preface = Preface.scheme ctx preface in
     %% -- main --
     let bb-main = read-block ctx inner in
     %% -- table of contents --
