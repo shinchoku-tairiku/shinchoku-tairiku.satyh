@@ -13,6 +13,7 @@
 @import: table-of-contents
 @import: command
 @import: side-index
+@import: header
 
 @import: itemize
 
@@ -36,60 +37,6 @@ end = struct
     let bb-inner = read-block ctx inner in
     bb-title +++ bb-inner +++ block-skip 30pt
 
-  let-mutable current-chapter-ref <- (0, 0, {})
-  let-mutable current-section-ref <- (0, 0, {})
-  let set-current-chapter pnum num title =
-    current-chapter-ref <- (pnum, num, title)
-  let set-current-section pnum num title =
-    current-section-ref <- (pnum, num, title)
-
-  let make-side-index ctx side =
-    let (_, num, _) = !current-chapter-ref in
-    let ib = SideIndex.make ctx side num in
-    line-break false false ctx ib
-
-  let make-chapter-title ctx =
-    let (_, num, it-title) = !current-chapter-ref in
-    let it-num = embed-string (`第` ^ arabic num ^ `章`) in
-    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
-    read-inline ctx it-num
-    ++ inline-skip 10pt
-    ++ read-inline ctx it-title
-
-  let make-section-title ctx =
-    let (_, chapter-num, _) = !current-chapter-ref in
-    let (_, section-num, it-title) = !current-section-ref in
-    let it-num = embed-string (arabic chapter-num ^ `.` ^ arabic section-num) in
-    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
-    read-inline ctx it-num
-    ++ inline-skip 10pt
-    ++ read-inline ctx it-title
-
-  let make-header pnum =
-    let ctx = Context.default Config.header-width in
-    let side = PageSide.of-page-number pnum in
-    let bb-side-index = make-side-index ctx side in
-    let (chapter-pnum, chapter-num, _) = !current-chapter-ref in
-    if chapter-pnum == 0 || chapter-pnum == pnum then bb-side-index else
-    let ib-pnum = read-inline ctx (embed-string (arabic pnum)) in
-    let page-part-width = (Config.header-width -' Config.text-width) *' 0.5 in
-    let page-skip-width = page-part-width -' get-natural-width ib-pnum in
-    let ib-main =
-      match side with
-      | LeftSide ->
-        let ib = make-chapter-title ctx in
-        ib-pnum ++ inline-skip page-skip-width ++ ib ++ inline-fil
-      | RightSide ->
-        let ib = make-section-title ctx in
-        inline-fil ++ ib ++ inline-skip page-skip-width ++ ib-pnum
-    in
-    let ctx-main = ctx |> set-paragraph-margin 0pt 5pt in
-    let bb-main = line-break false false ctx-main ib-main in
-    let ib-line = inline-fil ++ Graphics.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
-    let ctx-line = ctx |> set-paragraph-margin 0pt 0pt in
-    let bb-line = line-break false false ctx-line ib-line in
-    bb-side-index +++ bb-main +++ bb-line
-
   let make-footer = block-nil
 
   let page-shift pginfo (x, y) =
@@ -103,8 +50,12 @@ end = struct
     let ctx = Context.default Config.text-width in
     %% module settings
     let () = ShinchokuTairikuToc.register-chapter-hook CaptionedBox.set-chapter in
-    let () = ShinchokuTairikuToc.register-page-chapter-hook set-current-chapter in
-    let () = ShinchokuTairikuToc.register-page-section-hook set-current-section in
+    let () = ShinchokuTairikuToc.register-page-chapter-hook (fun pnum num title ->
+      Header.set-chapter num title pnum
+    ) in
+    let () = ShinchokuTairikuToc.register-page-section-hook (fun pnum num title ->
+      Header.set-section num title pnum
+    ) in
     %% -- preface --
     let bb-preface = make-preface ctx preface in
     %% -- main --
@@ -120,12 +71,12 @@ end = struct
         text-origin = page-shift pginfo Config.text-origin;
       |)
     in
-    let pagepartsf pginfo =
+    let pagepartsf pbinfo =
       (|
-        header-content = make-header pginfo#page-number;
-        header-origin  = page-shift pginfo Config.header-origin;
+        header-content = Header.scheme pbinfo#page-number;
+        header-origin  = page-shift pbinfo Config.header-origin;
         footer-content = make-footer;
-        footer-origin  = page-shift pginfo Config.footer-origin;
+        footer-origin  = page-shift pbinfo Config.footer-origin;
       |)
     in
     let page = UserDefinedPaper (Config.page-width, Config.page-height) in

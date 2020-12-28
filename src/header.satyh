@@ -1,0 +1,75 @@
+@import: context
+@import: config
+@import: graphics
+@import: side-index
+
+module Header : sig
+
+  val scheme : int -> block-boxes
+
+  val set-chapter : int -> inline-text -> int -> unit
+  val set-section : int -> inline-text -> int -> unit
+
+end = struct
+
+  let-mutable current-chapter-ref <- None
+  let-mutable current-section-ref <- None
+
+  let set-chapter num title pnum =
+    current-chapter-ref <- Some (num, title, pnum)
+  let set-section num title pnum =
+    current-section-ref <- Some (num, title, pnum)
+
+  let chapter-title-scheme ctx num it-title =
+    let it-num = embed-string (`第` ^ arabic num ^ `章`) in
+    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
+    read-inline ctx it-num
+    ++ inline-skip 10pt
+    ++ read-inline ctx it-title
+
+  let section-title-scheme ctx chapter-num section-num it-title =
+    let it-num = arabic chapter-num ^ `.` ^ arabic section-num |> embed-string in
+    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
+    read-inline ctx it-num
+    ++ inline-skip 10pt
+    ++ read-inline ctx it-title
+
+  let side-index-scheme ctx side chapter-num =
+    let ib = SideIndex.make ctx side chapter-num in
+    line-break false false ctx ib
+
+  let is-header-required pnum chapter-start-pnum =
+    not (pnum == chapter-start-pnum)
+
+  let scheme pnum =
+    match !current-chapter-ref with
+    | None -> block-nil
+    | Some (chapter-num, chapter-title, chapter-start-pnum) ->
+      let ctx = Context.default Config.header-width in
+      let side = PageSide.of-page-number pnum in
+      let bb-side-index = side-index-scheme ctx side chapter-num in
+      if is-header-required pnum chapter-start-pnum then
+        let ib-pnum = read-inline ctx (embed-string (arabic pnum)) in
+        let page-part-width = (Config.header-width -' Config.text-width) *' 0.5 in
+        let page-skip-width = page-part-width -' get-natural-width ib-pnum in
+        let ib-main =
+          match (side, !current-section-ref) with
+          | (LeftSide, _) ->
+            let ib = chapter-title-scheme ctx chapter-num chapter-title in
+            ib-pnum ++ inline-skip page-skip-width ++ ib ++ inline-fil
+          | (RightSide, Some (section-num, section-title, _)) ->
+            let ib = section-title-scheme ctx chapter-num section-num section-title in
+            inline-fil ++ ib ++ inline-skip page-skip-width ++ ib-pnum
+          | (_, _) ->
+            inline-nil
+        in
+        let ctx-main = ctx |> set-paragraph-margin 0pt 5pt in
+        let bb-main = line-break false false ctx-main ib-main in
+        let ib-line = inline-fil ++ Graphics.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
+        let ctx-line = ctx |> set-paragraph-margin 0pt 0pt in
+        let bb-line = line-break false false ctx-line ib-line in
+        bb-side-index +++ bb-main +++ bb-line
+      else
+        bb-side-index
+
+end
