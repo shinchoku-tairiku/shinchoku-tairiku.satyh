@@ -9,13 +9,12 @@ module TableOfContents : sig
 
   %% 指定のラベルにより RefNum で参照番号が、RefPage でページ番号が、
   %% Link でロケーションフレームが登録されている必要がある
-  val add-chapter : string -> inline-text -> unit
-  val add-section : string -> inline-text -> unit
-  val add-subsection : string -> inline-text -> unit
+  val add-chapter : label -> inline-text -> unit
+  val add-section : label -> inline-text -> unit
+  val add-subsection : label -> inline-text -> unit
 
 end = struct
 
-  type label = string
   type it-title = inline-text
   type page-number = int
   type toc-type =

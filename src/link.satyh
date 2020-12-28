@@ -2,11 +2,11 @@
 
 module Link : sig
 
-  val to : string -> inline-boxes -> inline-boxes
+  val to : label -> inline-boxes -> inline-boxes
 
-  val set : string -> inline-boxes -> inline-boxes
+  val set : label -> inline-boxes -> inline-boxes
 
-  val set-block : context -> string -> block-boxes -> block-boxes
+  val set-block : context -> label -> block-boxes -> block-boxes
 
 end = struct
 

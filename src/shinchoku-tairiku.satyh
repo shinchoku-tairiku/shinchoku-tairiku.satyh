@@ -23,9 +23,10 @@ module ShinchokuTairiku : sig
 
   val document : block-text -> block-text -> document
 
-  direct +chapter : [string?; (string * bib-item) list?; inline-text; inline-text; block-text] block-cmd
-  direct +section : [string?; inline-text; block-text] block-cmd
-  direct +subsection : [string?; inline-text; block-text] block-cmd
+  direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
+  direct +section : [label?; inline-text; block-text] block-cmd
+  direct +subsection : [label?; inline-text; block-text] block-cmd
+  %% TODO: add label
   direct +subsubsection : [inline-text; block-text] block-cmd
 
 end = struct

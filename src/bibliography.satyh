@@ -34,8 +34,8 @@ type bib-item =
 
 module Bibliography : sig
 
-  val make : context -> (string * bib-item) list -> block-boxes
-  direct \cite : [string] inline-cmd
+  val make : context -> (label * bib-item) list -> block-boxes
+  direct \cite : [label] inline-cmd
 
 end = struct
 

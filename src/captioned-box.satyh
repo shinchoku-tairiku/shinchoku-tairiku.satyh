@@ -9,9 +9,9 @@
 module CaptionedBox : sig
 
   val set-chapter : int -> unit
-  direct +figure : [string?; length?; string; inline-text] block-cmd
-  direct +code : [string?; string; inline-text] block-cmd
-  direct +table : [string?; (inline-text list) list; inline-text ] block-cmd
+  direct +figure : [label?; length?; string; inline-text] block-cmd
+  direct +code : [label?; string; inline-text] block-cmd
+  direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
 
 end = struct
 

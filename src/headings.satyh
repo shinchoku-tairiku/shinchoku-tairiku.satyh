@@ -5,14 +5,14 @@
 @import: ref-page
 
 type 'n heading-changed-event = (|
-  label : string;
+  label : label;
   num : 'n;
   title : inline-text;
 |)
 
 % こんなに情報いらないかもしれないが一応
 type 'n heading-page-fixed-event = (|
-  label : string;
+  label : label;
   num : 'n;
   title : inline-text;
   pbinfo : (| page-number : int |);
@@ -21,10 +21,10 @@ type 'n heading-page-fixed-event = (|
 module Headings : sig
 
   %% 以下すべて、指定のラベルで RefNum により参照番号が、RefPage によりページ番号が、Link によりリンクロケーションが登録される
-  val chapter-scheme : context -> string -> (string * bib-item) list -> inline-text -> inline-text -> block-text -> block-boxes
-  val section-scheme : context -> string -> inline-text -> block-text -> block-boxes
-  val subsection-scheme : context -> string -> inline-text -> block-text -> block-boxes
-  val subsubsection-scheme : context -> string -> inline-text -> block-text -> block-boxes
+  val chapter-scheme : context -> label -> (label * bib-item) list -> inline-text -> inline-text -> block-text -> block-boxes
+  val section-scheme : context -> label -> inline-text -> block-text -> block-boxes
+  val subsection-scheme : context -> label -> inline-text -> block-text -> block-boxes
+  val subsubsection-scheme : context -> label -> inline-text -> block-text -> block-boxes
 
   val add-chapter-changed-listener : (int heading-changed-event -> unit) -> unit
   val add-section-changed-listener : ((int * int) heading-changed-event -> unit) -> unit

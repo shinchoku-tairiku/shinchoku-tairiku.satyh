@@ -17,11 +17,11 @@ module ShinchokuTairikuCmd : sig
   direct \minipage : [float; block-text] inline-cmd
   direct \code : [string] inline-cmd
   direct \line-break : [] inline-cmd
-  direct \ref : [string] inline-cmd
+  direct \ref : [label] inline-cmd
   direct +p : [inline-text] block-cmd
   direct +row : [align?; inline-text list] block-cmd
   direct +column : [inline-text; block-text] block-cmd
-  direct +theorem : [inline-text?; string?; inline-text] block-cmd
+  direct +theorem : [inline-text?; label?; inline-text] block-cmd
   direct +proof : [inline-text?; block-text] block-cmd
 
 end = struct

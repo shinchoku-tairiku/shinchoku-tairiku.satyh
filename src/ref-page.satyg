@@ -1,8 +1,10 @@
+@import: label
+
 module RefPage : sig
 
   %% returns page-number (as a string)
-  val get : string -> string
-  val set : string -> int -> unit
+  val get : label -> string
+  val set : label -> int -> unit
 
 end = struct
 

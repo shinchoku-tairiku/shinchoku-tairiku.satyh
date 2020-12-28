@@ -1,7 +1,9 @@
+type label = string
+
 module Label : sig
 
-  val fresh : unit -> string
-  val or-fresh : string option -> string
+  val fresh : unit -> label
+  val or-fresh : label option -> label
 
 end = struct
 
