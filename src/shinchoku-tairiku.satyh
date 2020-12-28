@@ -43,6 +43,12 @@ end = struct
     let () = Headings.add-chapter-changed-listener (fun e ->
       CaptionedBox.set-chapter e#num
     ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      TableOfContents.add-chapter e#label e#title
+    ) in
+    let () = Headings.add-section-changed-listener (fun e ->
+      TableOfContents.add-section e#label e#title
+    ) in
     let () = Headings.add-chapter-page-fixed-listener (fun e ->
       Header.set-chapter e#num e#title e#pbinfo#page-number
     ) in
@@ -56,7 +62,7 @@ end = struct
     let bb-main = read-block ctx inner in
     %% -- table of contents --
     %% this must be after processing bb-main
-    let bb-toc = TableOfContents.make ctx in
+    let bb-toc = TableOfContents.scheme ctx in
     %% -- page settings --
     let pagecontf pginfo =
       let () = FootnoteScheme.start-page () in
