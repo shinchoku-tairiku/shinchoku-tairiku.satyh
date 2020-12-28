@@ -3,7 +3,7 @@
 @import: link
 @import: label
 
-module ShinchokuTairikuToc : sig
+module TableOfContents : sig
 
   val make : context -> block-boxes
   val register-chapter-hook : (int -> unit) -> unit

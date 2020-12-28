@@ -56,7 +56,7 @@ end = struct
     let bb-main = read-block ctx inner in
     %% -- table of contents --
     %% this must be after processing bb-main
-    let bb-toc = ShinchokuTairikuToc.make ctx in
+    let bb-toc = TableOfContents.make ctx in
     %% -- page settings --
     let pagecontf pginfo =
       let () = FootnoteScheme.start-page () in
