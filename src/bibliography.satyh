@@ -104,8 +104,11 @@ end = struct
       let ib-item = line-scheme ctx item ++ inline-fil in
       let num-width = get-natural-width ib-num in
       let ctx = set-paragraph-margin 12pt 12pt ctx in
-      let bb-item = block-frame-breakable ctx (20pt, 0pt, 0pt, 0pt) VDecoSet.empty (fun ctx -> line-break true true ctx (inline-skip (0pt -' num-width) ++ ib-num ++ ib-item)) in
-      % let bb-item = line-break true true ctx ib-item in
+      let bb-item =
+        block-frame-breakable ctx (20pt, 0pt, 0pt, 0pt) VDecoSet.empty (fun ctx ->
+          line-break true true ctx (inline-skip (0pt -' num-width) ++ ib-num ++ ib-item)
+        )
+      in
       bb +++ bb-item
     in
     items |> List.fold-left f block-nil
