@@ -49,6 +49,9 @@ end = struct
     let () = Headings.add-section-changed-listener (fun e ->
       TableOfContents.add-section e#label e#title
     ) in
+    let () = Headings.add-subsection-changed-listener (fun e ->
+      TableOfContents.add-subsection e#label e#title
+    ) in
     let () = Headings.add-chapter-page-fixed-listener (fun e ->
       Header.set-chapter e#num e#title e#pbinfo#page-number
     ) in

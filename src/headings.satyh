@@ -28,9 +28,11 @@ module Headings : sig
 
   val add-chapter-changed-listener : (int heading-changed-event -> unit) -> unit
   val add-section-changed-listener : ((int * int) heading-changed-event -> unit) -> unit
+  val add-subsection-changed-listener : ((int * int * int) heading-changed-event -> unit) -> unit
 
   val add-chapter-page-fixed-listener : (int heading-page-fixed-event -> unit) -> unit
   val add-section-page-fixed-listener : ((int * int) heading-page-fixed-event -> unit) -> unit
+  val add-subsection-page-fixed-listener : ((int * int * int) heading-page-fixed-event -> unit) -> unit
 
 end = struct
 
@@ -41,19 +43,25 @@ end = struct
 
   let chapter-changed-listeners = EventListeners.make ()
   let section-changed-listeners = EventListeners.make ()
+  let subsection-changed-listeners = EventListeners.make ()
 
   let chapter-page-fixed-listeners = EventListeners.make ()
   let section-page-fixed-listeners = EventListeners.make ()
+  let subsection-page-fixed-listeners = EventListeners.make ()
 
   let add-chapter-changed-listener =
     EventListeners.add chapter-changed-listeners
   let add-section-changed-listener =
     EventListeners.add section-changed-listeners
+  let add-subsection-changed-listener =
+    EventListeners.add subsection-changed-listeners
 
   let add-chapter-page-fixed-listener =
     EventListeners.add chapter-page-fixed-listeners
   let add-section-page-fixed-listener =
     EventListeners.add section-page-fixed-listeners
+  let add-subsection-page-fixed-listener =
+    EventListeners.add subsection-page-fixed-listeners
 
   let dispatch-changed-event label num title listeners =
     (|
@@ -134,6 +142,7 @@ end = struct
     let () = increment subsection-num-ref in
     let () = subsubsection-num-ref <- 0 in
     %% num
+    let nums = (!chapter-num-ref, !section-num-ref, !subsection-num-ref) in
     let s-num =
       arabic (!chapter-num-ref)
       ^ `.`
@@ -143,6 +152,8 @@ end = struct
     in
     %% set ref-num
     let () = RefNum.set label s-num in
+    %% dispatch event
+    let () = dispatch-changed-event label nums it-title subsection-changed-listeners in
     %% bb-title
     let ctx-title = subsection-context ctx in
     let it-num = embed-string s-num in
