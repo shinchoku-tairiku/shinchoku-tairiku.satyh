@@ -1,0 +1,20 @@
+module RefNum : sig
+
+  val get : string -> string
+  val set : string -> string -> unit
+
+end = struct
+
+  let make-key label =
+    `shinchoku-tairiku:` ^ label ^ `:num`
+
+  let get label =
+    match make-key label |> get-cross-reference with
+    | None -> `?`
+    | Some n -> n
+
+  let set label num =
+    let key = make-key label in
+    register-cross-reference key num
+
+end
