@@ -42,12 +42,15 @@ end = struct
     %% initial context
     let ctx = Context.default Config.text-width in
     %% module settings
-    let () = ShinchokuTairikuToc.register-chapter-hook CaptionedBox.set-chapter in
-    let () = ShinchokuTairikuToc.register-page-chapter-hook (fun pnum num title ->
-      Header.set-chapter num title pnum
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedBox.set-chapter e#num
     ) in
-    let () = ShinchokuTairikuToc.register-page-section-hook (fun pnum num title ->
-      Header.set-section num title pnum
+    let () = Headings.add-chapter-page-fixed-listener (fun e ->
+      Header.set-chapter e#num e#title e#pbinfo#page-number
+    ) in
+    let () = Headings.add-section-page-fixed-listener (fun e ->
+      %% NOTE: `let (_, num) = e#num in` を外にくくりだすと parse error
+      Header.set-section (let (_, num) = e#num in num) e#title e#pbinfo#page-number
     ) in
     %% -- preface --
     let bb-preface = Preface.scheme ctx preface in
