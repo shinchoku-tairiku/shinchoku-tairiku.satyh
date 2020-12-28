@@ -1,6 +1,8 @@
 @import: config
 @import: context
 @import: event-listeners
+@import: ref-num
+@import: ref-page
 
 type 'n heading-changed-event = (|
   label : string;
@@ -18,6 +20,7 @@ type 'n heading-page-fixed-event = (|
 
 module Headings : sig
 
+  %% 以下すべて、指定のラベルで RefNum により参照番号が、RefPage によりページ番号が、Link によりリンクロケーションが登録される
   val chapter-scheme : context -> string -> (string * bib-item) list -> inline-text -> inline-text -> block-text -> block-boxes
   val section-scheme : context -> string -> inline-text -> block-text -> block-boxes
   val subsection-scheme : context -> string -> inline-text -> block-text -> block-boxes
@@ -34,6 +37,7 @@ end = struct
   let-mutable chapter-num-ref <- 0
   let-mutable section-num-ref <- 0
   let-mutable subsection-num-ref <- 0
+  let-mutable subsubsection-num-ref <- 0
 
   let chapter-changed-listeners = EventListeners.make ()
   let section-changed-listeners = EventListeners.make ()
@@ -81,15 +85,19 @@ end = struct
     %% reset nums
     let () = increment section-num-ref in
     let () = subsection-num-ref <- 0 in
+    let () = subsubsection-num-ref <- 0 in
     %% num
     let nums = (!chapter-num-ref, !section-num-ref) in
+    let s-num = arabic (!chapter-num-ref) ^ `.` ^ arabic (!section-num-ref) in
+    %% set ref-num
+    let () = RefNum.set label s-num in
     %% dispatch event
     let () = dispatch-changed-event label nums it-title section-changed-listeners in
     %% bb-title
     let ctx-title = section-context ctx in
-    let s-num = arabic (!chapter-num-ref) ^ `.` ^ arabic (!section-num-ref) in
     let it-num = embed-string s-num in
     let page-hook pbinfo _ =
+      let () = RefPage.set label pbinfo#page-number in
       dispatch-page-fixed-event label nums it-title pbinfo section-page-fixed-listeners
     in
     let ib-title =
@@ -124,6 +132,7 @@ end = struct
   let subsection-scheme ctx label it-title bt-main =
     %% reset nums
     let () = increment subsection-num-ref in
+    let () = subsubsection-num-ref <- 0 in
     %% num
     let s-num =
       arabic (!chapter-num-ref)
@@ -132,12 +141,13 @@ end = struct
       ^ `.`
       ^ arabic (!subsection-num-ref)
     in
+    %% set ref-num
+    let () = RefNum.set label s-num in
     %% bb-title
     let ctx-title = subsection-context ctx in
     let it-num = embed-string s-num in
     let page-hook pbinfo _ =
-      %% TODO: ref-page
-      ()
+      RefPage.set label pbinfo#page-number
     in
     let ib-title =
       read-inline ctx-title it-title
@@ -163,11 +173,24 @@ end = struct
     |> set-paragraph-margin 18pt 10pt
 
   let subsubsection-scheme ctx label it-title bt-main =
+    %% reset nums
+    let () = increment subsubsection-num-ref in
+    %% num
+    let s-num =
+      arabic (!chapter-num-ref)
+      ^ `.`
+      ^ arabic (!section-num-ref)
+      ^ `.`
+      ^ arabic (!subsection-num-ref)
+      ^ `.`
+      ^ arabic (!subsubsection-num-ref)
+    in
+    %% set ref-num
+    let () = RefNum.set label s-num in
     %% bb-title
     let ctx-title = subsubsection-context ctx in
     let page-hook pbinfo _ =
-      %% TODO: ref-page
-      ()
+      RefPage.set label pbinfo#page-number
     in
     let ib-title =
       read-inline ctx-title it-title
@@ -208,15 +231,19 @@ end = struct
     let () = increment chapter-num-ref in
     let () = section-num-ref <- 0 in
     let () = subsection-num-ref <- 0 in
+    let () = subsubsection-num-ref <- 0 in
     %% num
     let num = !chapter-num-ref in
+    let s-num = arabic num in
+    %% set ref-num
+    let () = RefNum.set label s-num in
     %% changed-event
     let () = dispatch-changed-event label num it-title chapter-changed-listeners in
     %% num
-    let s-num = arabic num in
     let human-num = `第` ^ s-num ^ `章` in
     let it-num = embed-string human-num in
     let page-hook pbinfo _ =
+      let () = RefPage.set label pbinfo#page-number in
       dispatch-page-fixed-event label num it-title pbinfo chapter-page-fixed-listeners
     in
     let ctx-num = chapter-num-context ctx in
@@ -224,7 +251,10 @@ end = struct
       read-inline ctx-num it-num
       ++ hook-page-break page-hook
     in
-    let bb-num = line-break true false ctx-num ib-num in
+    let bb-num =
+      Link.set label ib-num
+      |> line-break true false ctx-num
+    in
     %% title
     let ctx-title = chapter-title-context ctx in
     let ib-title = read-inline ctx-title it-title in
