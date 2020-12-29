@@ -1,3 +1,4 @@
+@require: pervasives
 @require: class-shinchoku-tairiku/shinchoku-tairiku
 
 let bib-items = [

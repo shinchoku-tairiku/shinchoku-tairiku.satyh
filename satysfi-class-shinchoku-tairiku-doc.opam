@@ -15,6 +15,7 @@ depends: [
   "satysfi" { >= "0.0.5" & < "0.0.6" }
   "satyrographos" { >= "0.0.2.6" & < "0.0.3" }
 
+  "satysfi-dist"
   "satysfi-class-shinchoku-tairiku" {= "%{version}%"}
 ]
 build: [

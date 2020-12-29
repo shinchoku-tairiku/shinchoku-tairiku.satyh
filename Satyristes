@@ -22,5 +22,6 @@
     ((doc "manual.pdf" "doc/manual.pdf")))
   (opam "satysfi-class-shinchoku-tairiku-doc.opam")
   (dependencies
-    ((class-shinchoku-tairiku ())
+    ((dist ())
+     (class-shinchoku-tairiku ())
     )))
