@@ -157,10 +157,24 @@ end = struct
   %% block commands
   %%
 
+  %% TODO: use satysfi-base's one
+  let-block ctx +eval-const bb = bb
+
   let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote bt-main =
     let label = Label.or-fresh labelopt in
+    let bb-chapter = Headings.chapter-scheme ctx label it-title it-quote bt-main in
+    %% bibliography
     let bib-items = Option.from [] bib-itemsopt in
-    Headings.chapter-scheme ctx label bib-items it-title it-quote bt-main
+    let bb-bib =
+      match bib-items with
+      | [] -> block-nil
+      | _ ->
+        let bib-label = Label.fresh () in
+        let bb-content = Bibliography.scheme ctx bib-items in
+        Headings.section-scheme ctx bib-label {参考文献} '<+eval-const(bb-content);>
+    in
+    %% finalize
+    bb-chapter +++ bb-bib
 
   let-block ctx +section ?:labelopt it-title bt-main =
     let label = Label.or-fresh labelopt in

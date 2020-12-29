@@ -21,7 +21,7 @@ type 'n heading-page-fixed-event = (|
 module Headings : sig
 
   %% 以下すべて、指定のラベルで RefNum により参照番号が、RefPage によりページ番号が、Link によりリンクロケーションが登録される
-  val chapter-scheme : context -> label -> (label * bib-item) list -> inline-text -> inline-text -> block-text -> block-boxes
+  val chapter-scheme : context -> label -> inline-text -> inline-text -> block-text -> block-boxes
   val section-scheme : context -> label -> inline-text -> block-text -> block-boxes
   val subsection-scheme : context -> label -> inline-text -> block-text -> block-boxes
   val subsubsection-scheme : context -> label -> inline-text -> block-text -> block-boxes
@@ -79,6 +79,78 @@ end = struct
       pbinfo = pbinfo;
     |)
     |> EventListeners.dispatch listeners
+
+  %%
+  %% chapter
+  %%
+
+  let chapter-num-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size 20pt
+
+  let chapter-title-context ctx =
+    ctx
+    |> Context.set-font Config.font-cjk-gothic-bold
+    |> set-font-size 30pt
+
+  let chapter-quote-context ctx =
+    ctx
+
+  let chapter-scheme ctx label it-title it-quote bt-main =
+    %% reset nums
+    let () = increment chapter-num-ref in
+    let () = section-num-ref <- 0 in
+    let () = subsection-num-ref <- 0 in
+    let () = subsubsection-num-ref <- 0 in
+    %% num
+    let num = !chapter-num-ref in
+    let s-num = arabic num in
+    %% set ref-num
+    let () = RefNum.set label s-num in
+    %% changed-event
+    let () = dispatch-changed-event label num it-title chapter-changed-listeners in
+    %% num
+    let human-num = `第` ^ s-num ^ `章` in
+    let it-num = embed-string human-num in
+    let page-hook pbinfo _ =
+      let () = RefPage.set label pbinfo#page-number in
+      dispatch-page-fixed-event label num it-title pbinfo chapter-page-fixed-listeners
+    in
+    let ctx-num = chapter-num-context ctx in
+    let ib-num =
+      read-inline ctx-num it-num
+      ++ hook-page-break page-hook
+    in
+    let bb-num =
+      Link.set label ib-num
+      |> line-break true false ctx-num
+    in
+    %% title
+    let ctx-title = chapter-title-context ctx in
+    let ib-title = read-inline ctx-title it-title in
+    let bb-title = line-break false false ctx-title ib-title in
+    %% quote
+    let ctx-quote = chapter-quote-context ctx in
+    let ib-quote = read-inline ctx-quote it-quote in
+    let bb-quote =
+      inline-fil ++ ib-quote
+      |> line-break false false ctx-quote
+    in
+    %% main
+    let bb-main = read-block ctx bt-main in
+    %% finalize
+    [
+      clear-page;
+      block-skip 20pt;
+      bb-num;
+      block-skip 8pt;
+      bb-title;
+      block-skip 12pt;
+      bb-quote;
+      block-skip 28pt;
+      bb-main;
+    ] |> List.fold-left (+++) block-nil
 
   %%
   %% section
@@ -215,92 +287,5 @@ end = struct
     let bb-main = read-block ctx bt-main in
     %% finalize
     bb-title +++ bb-main
-
-  %%
-  %% chapter
-  %%
-  %% chapter は section-scheme を使う関係で section よりも後ろに置く必要がある
-
-  let chapter-num-context ctx =
-    ctx
-    |> Context.set-font Config.font-cjk-gothic-bold
-    |> set-font-size 20pt
-
-  let chapter-title-context ctx =
-    ctx
-    |> Context.set-font Config.font-cjk-gothic-bold
-    |> set-font-size 30pt
-
-  let chapter-quote-context ctx =
-    ctx
-
-  %% TODO: use satysfi-base's one
-  let-block ctx +eval-const bb = bb
-
-  let chapter-scheme ctx label bib-items it-title it-quote bt-main =
-    %% reset nums
-    let () = increment chapter-num-ref in
-    let () = section-num-ref <- 0 in
-    let () = subsection-num-ref <- 0 in
-    let () = subsubsection-num-ref <- 0 in
-    %% num
-    let num = !chapter-num-ref in
-    let s-num = arabic num in
-    %% set ref-num
-    let () = RefNum.set label s-num in
-    %% changed-event
-    let () = dispatch-changed-event label num it-title chapter-changed-listeners in
-    %% num
-    let human-num = `第` ^ s-num ^ `章` in
-    let it-num = embed-string human-num in
-    let page-hook pbinfo _ =
-      let () = RefPage.set label pbinfo#page-number in
-      dispatch-page-fixed-event label num it-title pbinfo chapter-page-fixed-listeners
-    in
-    let ctx-num = chapter-num-context ctx in
-    let ib-num =
-      read-inline ctx-num it-num
-      ++ hook-page-break page-hook
-    in
-    let bb-num =
-      Link.set label ib-num
-      |> line-break true false ctx-num
-    in
-    %% title
-    let ctx-title = chapter-title-context ctx in
-    let ib-title = read-inline ctx-title it-title in
-    let bb-title = line-break false false ctx-title ib-title in
-    %% quote
-    let ctx-quote = chapter-quote-context ctx in
-    let ib-quote = read-inline ctx-quote it-quote in
-    let bb-quote =
-      inline-fil ++ ib-quote
-      |> line-break false false ctx-quote
-    in
-    %% main
-    let bb-main = read-block ctx bt-main in
-    %% bibliography
-    %% TODO: bibliography の依存を切り離したい
-    let bb-bib =
-      match bib-items with
-      | [] -> block-nil
-      | _ ->
-        let bib-label = Label.fresh () in
-        let bb-content = Bibliography.scheme ctx bib-items in
-        section-scheme ctx bib-label {参考文献} '<+eval-const(bb-content);>
-    in
-    %% finalize
-    [
-      clear-page;
-      block-skip 20pt;
-      bb-num;
-      block-skip 8pt;
-      bb-title;
-      block-skip 12pt;
-      bb-quote;
-      block-skip 28pt;
-      bb-main;
-      bb-bib;
-    ] |> List.fold-left (+++) block-nil
 
 end
