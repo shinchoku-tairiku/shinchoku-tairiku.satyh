@@ -27,8 +27,9 @@ end = struct
       let font-size = Config.font-size-footnote in
       %% symbol
       let ib-symbol =
-        read-inline (ctx-symbol font-size) {#symbol;#it-num;}
-        |> Link.set label
+        inline-skip 14pt
+        ++ (read-inline (ctx-symbol font-size) {#symbol;#it-num;} |> Link.set label)
+        ++ inline-skip 3pt
       in
       %% footnote
       let symbol-width = get-natural-width ib-symbol in
@@ -45,10 +46,7 @@ end = struct
         )
       in
       %% finalize
-      inline-skip 14pt
-      ++ ib-symbol
-      ++ inline-skip 3pt
-      ++ ib-footnote
+      ib-symbol ++ ib-footnote
       |> line-break false false ctx
     in
     FootnoteScheme.main (ctx |> set-font-size 5pt) ibf bbf
