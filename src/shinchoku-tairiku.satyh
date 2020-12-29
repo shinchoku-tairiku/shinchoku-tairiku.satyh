@@ -26,6 +26,12 @@ module ShinchokuTairiku : sig
 
   direct \cite : [label] inline-cmd
   direct \footnote : [inline-text] inline-cmd
+  direct \emph : [inline-text] inline-cmd
+  direct \url : [string] inline-cmd
+  direct \minipage : [float; block-text] inline-cmd
+  direct \code : [string] inline-cmd
+  direct \line-break : [] inline-cmd
+  direct \ref : [label] inline-cmd
 
   direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
   direct +section : [label?; inline-text; block-text] block-cmd
@@ -100,11 +106,52 @@ end = struct
     let bb = bb-preface +++ bb-toc +++ bb-main in
     page-break page pagecontf pagepartsf bb
 
+  %%
+  %% inline commands
+  %%
+
   let-inline ctx \cite label =
     Bibliography.cite-scheme ctx label
 
   let-inline ctx \footnote it =
     Footnote.scheme ctx it
+
+  let-inline ctx \emph it =
+    let ctx = Context.set-font Config.font-cjk-gothic ctx in
+    read-inline ctx it
+
+  let-inline ctx \url url =
+    let ctx = Context.set-latin-font Config.font-mono ctx in
+    read-inline ctx {\href(url)(embed-string url);}
+
+  let-inline ctx \code code =
+    let pads = (4pt, 4pt, 4pt, 4pt) in
+    let decoset = HDecoSet.rectangle-round-fill 2pt 2pt (Color.gray 0.95) in
+    let ctx = Context.set-latin-font Config.font-mono ctx in
+    let ib =
+      embed-string code
+      |> read-inline ctx
+      |> inline-frame-breakable pads decoset
+    in
+    script-guard Latin ib
+
+  let-inline ctx \minipage ratio inner =
+    let width = get-text-width ctx *' ratio in
+    embed-block-top ctx width (fun ctx -> read-block ctx inner)
+
+  let-inline ctx \line-break =
+    discretionary (0 - 10000) inline-nil inline-fil inline-nil
+
+  let-inline ctx \ref label =
+    get-cross-reference (label ^ `:num`)
+    |> Option.from `?`
+    |> embed-string
+    |> read-inline ctx
+    |> Link.to label
+
+  %%
+  %% block commands
+  %%
 
   let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote bt-main =
     let label = Label.or-fresh labelopt in

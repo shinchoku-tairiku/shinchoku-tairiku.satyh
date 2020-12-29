@@ -11,12 +11,6 @@ type align =
 
 module ShinchokuTairikuCmd : sig
 
-  direct \emph : [inline-text] inline-cmd
-  direct \url : [string] inline-cmd
-  direct \minipage : [float; block-text] inline-cmd
-  direct \code : [string] inline-cmd
-  direct \line-break : [] inline-cmd
-  direct \ref : [label] inline-cmd
   direct +p : [inline-text] block-cmd
   direct +row : [align?; inline-text list] block-cmd
   direct +column : [inline-text; block-text] block-cmd
@@ -24,39 +18,6 @@ module ShinchokuTairikuCmd : sig
   direct +proof : [inline-text?; block-text] block-cmd
 
 end = struct
-
-  let-inline ctx \emph it =
-    let ctx = Context.set-font Config.font-cjk-gothic ctx in
-    read-inline ctx it
-
-  let-inline ctx \url url =
-    let ctx = Context.set-latin-font Config.font-mono ctx in
-    read-inline ctx {\href(url)(embed-string url);}
-
-  let-inline ctx \code code =
-    let pads = (4pt, 4pt, 4pt, 4pt) in
-    let decoset = HDecoSet.rectangle-round-fill 2pt 2pt (Color.gray 0.95) in
-    let ctx = Context.set-latin-font Config.font-mono ctx in
-    let ib =
-      embed-string code
-      |> read-inline ctx
-      |> inline-frame-breakable pads decoset
-    in
-    script-guard Latin ib
-
-  let-inline ctx \minipage ratio inner =
-    let width = get-text-width ctx *' ratio in
-    embed-block-top ctx width (fun ctx -> read-block ctx inner)
-
-  let-inline ctx \line-break =
-    discretionary (0 - 10000) inline-nil inline-fil inline-nil
-
-  let-inline ctx \ref label =
-    get-cross-reference (label ^ `:num`)
-    |> Option.from `?`
-    |> embed-string
-    |> read-inline ctx
-    |> Link.to label
 
   let-block ctx +p it =
     let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in
