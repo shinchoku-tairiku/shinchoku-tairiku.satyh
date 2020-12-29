@@ -185,7 +185,7 @@ end = struct
 
   let-block ctx +p it =
     let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in
-    form-paragraph ctx ib
+    line-break true true ctx ib
 
   %% TODO: PDF 以外も受け取れるようにする or PDF のみであることを明示
   let-block ctx +figure ?:labelopt ?:widthopt path caption =
