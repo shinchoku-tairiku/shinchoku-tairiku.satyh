@@ -30,8 +30,7 @@ module ShinchokuTairiku : sig
   direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
   direct +section : [label?; inline-text; block-text] block-cmd
   direct +subsection : [label?; inline-text; block-text] block-cmd
-  %% TODO: add label
-  direct +subsubsection : [inline-text; block-text] block-cmd
+  direct +subsubsection : [label?; inline-text; block-text] block-cmd
   direct +p : [inline-text] block-cmd
   direct +figure : [label?; length?; string; inline-text] block-cmd
   direct +code : [label?; string; inline-text] block-cmd
@@ -179,8 +178,8 @@ end = struct
     let label = Label.or-fresh labelopt in
     Headings.subsection-scheme ctx label it-title bt-main
 
-  let-block ctx +subsubsection it-title bt-main =
-    let label = Label.fresh () in
+  let-block ctx +subsubsection ?:labelopt it-title bt-main =
+    let label = Label.or-fresh labelopt in
     Headings.subsubsection-scheme ctx label it-title bt-main
 
   let-block ctx +p it =
