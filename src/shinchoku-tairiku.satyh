@@ -17,6 +17,7 @@
 @import: preface
 @import: headings
 @import: footnote
+@import: theorem
 
 @import: itemize
 
@@ -41,6 +42,8 @@ module ShinchokuTairiku : sig
   direct +figure : [label?; length?; string; inline-text] block-cmd
   direct +code : [label?; string; inline-text] block-cmd
   direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
+  direct +theorem : [inline-text?; label?; inline-text] block-cmd
+  direct +proof : [inline-text?; block-text] block-cmd
 
 end = struct
 
@@ -182,6 +185,13 @@ end = struct
   let-block ctx +table ?:labelopt ll caption =
     let label = Label.or-fresh labelopt in
     CaptionedTable.scheme ctx label ll caption
+
+  let-block ctx +theorem ?:wordopt ?:labelopt inner =
+    let label = Label.or-fresh (Option.map (fun l -> `theorem:` ^ l) labelopt) in
+    Theorem.theorem-scheme ctx label {Theorem} wordopt inner
+
+  let-block ctx +proof ?:wordopt inner =
+    Theorem.proof-scheme ctx wordopt inner
 
 end
 
