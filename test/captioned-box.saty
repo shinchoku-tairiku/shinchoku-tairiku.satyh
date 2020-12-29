@@ -18,7 +18,7 @@ bar
     +p{\ref(`figure-1.2`);}
   >
   +chapter{test}{test}<
-    +figure?:(`figure-2.1`)?:(5cm)(`figure.pdf`){figure caption}
+    +figure?:(`figure-2.1`)?:(10cm)(`figure.pdf`){figure caption}
     +p{\ref(`figure-2.1`);}
   >
 >
