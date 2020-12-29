@@ -12,7 +12,6 @@ type align =
 module ShinchokuTairikuCmd : sig
 
   direct \emph : [inline-text] inline-cmd
-  direct \footnote : [inline-text] inline-cmd
   direct \url : [string] inline-cmd
   direct \minipage : [float; block-text] inline-cmd
   direct \code : [string] inline-cmd
@@ -29,41 +28,6 @@ end = struct
   let-inline ctx \emph it =
     let ctx = Context.set-font Config.font-cjk-gothic ctx in
     read-inline ctx it
-
-  let-inline ctx \footnote it =
-    let symbol = {†} in
-    let ctx-symbol size =
-      ctx
-      |> set-font-size (size *' 0.75)
-      |> set-manual-rising (size *' 0.35)
-    in
-    let label = Label.or-fresh None in
-    let ibf num =
-      let it-num = embed-string (arabic num) in
-      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;} |> Link.to label
-    in
-    let bbf num =
-      let it-num = embed-string (arabic num) in
-      let font-size = Config.font-size-footnote in
-      let ib-symbol =
-        inline-skip 14pt
-        ++ (read-inline (ctx-symbol font-size) {#symbol;#it-num;} |> Link.set label)
-        ++ inline-skip 3pt
-      in
-      let symbol-width = get-natural-width ib-symbol in
-      let text-width = get-text-width ctx in
-      let ib = read-inline (ctx |> set-font-size font-size) {#it;} in
-      let ctx =
-        ctx
-        |> set-paragraph-margin 3pt 3pt
-        |> set-leading (font-size *' 1.2)
-      in
-      let ib =
-        embed-block-top ctx (text-width -' symbol-width) (fun ctx -> line-break false false ctx (ib ++ inline-fil))
-      in
-      line-break false false ctx (ib-symbol ++ ib)
-    in
-    FootnoteScheme.main (ctx |> set-font-size 5pt) ibf bbf
 
   let-inline ctx \url url =
     let ctx = Context.set-latin-font Config.font-mono ctx in

@@ -16,6 +16,7 @@
 @import: header
 @import: preface
 @import: headings
+@import: footnote
 
 @import: itemize
 
@@ -24,6 +25,7 @@ module ShinchokuTairiku : sig
   val document : block-text -> block-text -> document
 
   direct \cite : [label] inline-cmd
+  direct \footnote : [inline-text] inline-cmd
 
   direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
   direct +section : [label?; inline-text; block-text] block-cmd
@@ -100,6 +102,9 @@ end = struct
 
   let-inline ctx \cite label =
     Bibliography.cite-scheme ctx label
+
+  let-inline ctx \footnote it =
+    Footnote.scheme ctx it
 
   let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote bt-main =
     let label = Label.or-fresh labelopt in

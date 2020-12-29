@@ -1,0 +1,56 @@
+@require: footnote-scheme
+
+module Footnote : sig
+
+  val scheme : context -> inline-text -> inline-boxes
+
+end = struct
+
+  let scheme ctx it =
+    let label = Label.fresh () in
+    %% symbol
+    let symbol = {†} in
+    let ctx-symbol size =
+      ctx
+      |> set-font-size (size *' 0.75)
+      |> set-manual-rising (size *' 0.35)
+    in
+    %% ibf: 本文側
+    let ibf num =
+      let it-num = arabic num |> embed-string in
+      read-inline (ctx-symbol Config.font-size-normal) {#symbol;#it-num;}
+      |> Link.to label
+    in
+    %% bbf: 脚注側
+    let bbf num =
+      let it-num = embed-string (arabic num) in
+      let font-size = Config.font-size-footnote in
+      %% symbol
+      let ib-symbol =
+        read-inline (ctx-symbol font-size) {#symbol;#it-num;}
+        |> Link.set label
+      in
+      %% footnote
+      let symbol-width = get-natural-width ib-symbol in
+      let text-width = get-text-width ctx in
+      let ib-footnote-raw = read-inline (ctx |> set-font-size font-size) it in
+      let ctx =
+        ctx
+        |> set-paragraph-margin 3pt 3pt
+        |> set-leading (font-size *' 1.2)
+      in
+      let ib-footnote =
+        embed-block-top ctx (text-width -' symbol-width) (fun ctx ->
+          line-break false false ctx (ib-footnote-raw ++ inline-fil)
+        )
+      in
+      %% finalize
+      inline-skip 14pt
+      ++ ib-symbol
+      ++ inline-skip 3pt
+      ++ ib-footnote
+      |> line-break false false ctx
+    in
+    FootnoteScheme.main (ctx |> set-font-size 5pt) ibf bbf
+
+end
