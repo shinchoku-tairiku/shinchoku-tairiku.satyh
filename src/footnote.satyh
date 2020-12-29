@@ -4,7 +4,16 @@ module Footnote : sig
 
   val scheme : context -> inline-text -> inline-boxes
 
+  %% document 関数内でこれを呼ぶ必要がある
+  val initialize : unit -> unit
+
+  %% pagecontf 内でこれを呼ぶ必要がある
+  val start-page : unit -> unit
+
 end = struct
+
+  let initialize = FootnoteScheme.initialize
+  let start-page = FootnoteScheme.start-page
 
   let scheme ctx it =
     let label = Label.fresh () in

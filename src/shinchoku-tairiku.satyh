@@ -1,7 +1,6 @@
 @require: math
 @require: option
 @require: annot
-@require: footnote-scheme
 @require: code
 @require: hdecoset
 
@@ -59,6 +58,7 @@ end = struct
     %% initial context
     let ctx = Context.default Config.text-width in
     %% module settings
+    let () = Footnote.initialize () in
     let () = Headings.add-chapter-changed-listener (fun e ->
       CaptionedFigure.update-base-num e#num
     ) in
@@ -93,7 +93,7 @@ end = struct
     let bb-toc = TableOfContents.scheme ctx in
     %% -- page settings --
     let pagecontf pbinfo =
-      let () = FootnoteScheme.start-page () in
+      let () = Footnote.start-page () in
       (|
         text-height = Config.text-height;
         text-origin = page-shift pbinfo Config.text-origin;
