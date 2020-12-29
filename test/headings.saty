@@ -1,0 +1,16 @@
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+document '<> '<
+  +chapter?:(`chapter`)?*{chapter}{quote}<
+    +section?:(`section`){section}<
+      +subsection?:(`subsection`){subsection}<
+        +subsubsection{subsubsection}<
+          +p{chapter \ref(`chapter`);}
+          +p{section \ref(`section`);}
+          +p{subsection \ref(`subsection`);}
+          %% TODO: ref to subsubsection
+        >
+      >
+    >
+  >
+>
