@@ -75,7 +75,7 @@ end = struct
     let s-num =
       (arabic (!num-theorems))
     in
-    let () = register-cross-reference (label ^ `:num`) s-num in
+    let () = RefNum.set label s-num in
     let it-num = embed-string s-num in
     let ib-dfn =
       read-inline (ctx |> Context.set-latin-font Config.font-latin-bold) {#category; #it-num;}

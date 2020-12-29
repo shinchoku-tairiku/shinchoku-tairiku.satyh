@@ -143,8 +143,7 @@ end = struct
     discretionary (0 - 10000) inline-nil inline-fil inline-nil
 
   let-inline ctx \ref label =
-    get-cross-reference (label ^ `:num`)
-    |> Option.from `?`
+    RefNum.get label
     |> embed-string
     |> read-inline ctx
     |> Link.to label
