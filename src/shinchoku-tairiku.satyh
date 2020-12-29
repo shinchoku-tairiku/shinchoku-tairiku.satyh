@@ -49,9 +49,9 @@ module ShinchokuTairiku : sig
 
 end = struct
 
-  let page-shift pginfo (x, y) =
+  let page-shift pbinfo (x, y) =
     let l = 3mm in
-    match PageSide.of-page-number pginfo#page-number with
+    match PageSide.of-page-number pbinfo#page-number with
     | LeftSide -> (x -' 10pt, y)
     | RightSide -> (x +' 10pt, y)
 
@@ -92,11 +92,11 @@ end = struct
     %% this must be after processing bb-main
     let bb-toc = TableOfContents.scheme ctx in
     %% -- page settings --
-    let pagecontf pginfo =
+    let pagecontf pbinfo =
       let () = FootnoteScheme.start-page () in
       (|
         text-height = Config.text-height;
-        text-origin = page-shift pginfo Config.text-origin;
+        text-origin = page-shift pbinfo Config.text-origin;
       |)
     in
     let pagepartsf pbinfo =
