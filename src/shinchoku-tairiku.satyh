@@ -151,7 +151,7 @@ end = struct
   %% block commands
   %%
 
-  %% TODO: use satysfi-base's one
+  %% copied from satysfi-base
   let-block ctx +eval-const bb = bb
 
   let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote bt-main =
