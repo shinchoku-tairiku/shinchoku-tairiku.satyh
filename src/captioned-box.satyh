@@ -33,7 +33,7 @@ module Caption : sig
   %% e.g., scheme ctx `label` {図} 1 2 {なにかの図} ...
   %%
   %% 指定したラベルで RefNum, RefPage, Link が設定される
-  val scheme : context -> label -> inline-text -> int -> int -> inline-text -> block-boxes -> block-boxes
+  val scheme : context -> label -> inline-text -> int -> int -> inline-text -> inline-boxes -> block-boxes
 
   %% TODO: モジュールファンクタが入ったら以下は必要なくなる
   val setup-num-ref : unit -> (int ref * int ref * (int -> unit))
@@ -43,10 +43,19 @@ end = struct
   let inner-margin = 8pt
   let outer-margin = 20pt
 
-  let scheme ctx label kind base-num kind-num caption bb-main =
+  let scheme ctx label kind base-num kind-num caption ib-main =
+    %% main
+    let ctx-main =
+      ctx
+      |> set-paragraph-margin outer-margin inner-margin
+    in
+    let bb-main =
+      inline-fil ++ ib-main ++ inline-fil
+      |> line-break true false ctx-main
+    in
+    %% caption
     let num = arabic base-num ^ `.` ^ arabic kind-num in
     let () = RefNum.set label num in
-    %% caption
     let it-num = embed-string num in
     let ctx-caption =
       ctx
@@ -92,23 +101,13 @@ module CaptionedFigure : sig
 
 end = struct
 
-  %% これらは Caption モジュールに寄せたい
-  let inner-margin = 8pt
-  let outer-margin = 20pt
-
   let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
 
   let pdf-scheme ctx label width path caption =
     let () = increment kind-num-ref in
     let pdf = load-pdf-image path 1 in
     let ib-image = use-image-by-width pdf width in
-    %% ここで中央寄せするの微妙感ある (Caption に寄せたい)
-    let ctx-image = set-paragraph-margin outer-margin inner-margin ctx in
-    let bb-image =
-      inline-fil ++ ib-image ++ inline-fil
-      |> line-break true false ctx-image
-    in
-    Caption.scheme ctx label {図} !base-num-ref !kind-num-ref caption bb-image
+    Caption.scheme ctx label {図} !base-num-ref !kind-num-ref caption ib-image
 
 end
 
@@ -119,24 +118,21 @@ module CaptionedCode : sig
 
 end = struct
 
-  %% これらは Caption モジュールに寄せたい
-  let inner-margin = 8pt
-  let outer-margin = 20pt
-
   let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
 
   let scheme ctx label code caption =
     let () = increment kind-num-ref in
     let ctx-code =
       ctx
-      |> set-paragraph-margin outer-margin inner-margin
+      |> set-paragraph-margin 0pt 0pt
       |> set-font-size Config.font-size-small
       |> set-leading (Config.font-size-small *' 1.25)
       |> Context.set-font Config.font-cjk-gothic
     in
     let decoset = VDecoSet.simple-frame 1pt (Color.gray 0.6) (Color.gray 0.9) in
     let bb-code = Code.scheme decoset Color.black ctx-code code in
-    Caption.scheme ctx label {コード} !base-num-ref !kind-num-ref caption bb-code
+    let ib-code = embed-block-breakable ctx bb-code in
+    Caption.scheme ctx label {コード} !base-num-ref !kind-num-ref caption ib-code
 
 end
 
@@ -146,9 +142,6 @@ module CaptionedTable : sig
   val scheme : context -> label -> (inline-text list) list -> inline-text -> block-boxes
 
 end = struct
-
-  let inner-margin = 8pt
-  let outer-margin = 20pt
 
   let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
 
@@ -174,7 +167,6 @@ end = struct
       List.append vlines hlines
     in
     let ib = tabular cellss grf in
-    let bb = inline-fil ++ ib ++ inline-fil |> line-break true true ctx in
-    Caption.scheme ctx label {表} !base-num-ref !kind-num-ref caption bb
+    Caption.scheme ctx label {表} !base-num-ref !kind-num-ref caption ib
 
 end
