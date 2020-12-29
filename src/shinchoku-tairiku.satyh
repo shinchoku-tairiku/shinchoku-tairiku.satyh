@@ -30,6 +30,9 @@ module ShinchokuTairiku : sig
   direct +subsection : [label?; inline-text; block-text] block-cmd
   %% TODO: add label
   direct +subsubsection : [inline-text; block-text] block-cmd
+  direct +figure : [label?; length?; string; inline-text] block-cmd
+  direct +code : [label?; string; inline-text] block-cmd
+  direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
 
 end = struct
 
@@ -44,7 +47,13 @@ end = struct
     let ctx = Context.default Config.text-width in
     %% module settings
     let () = Headings.add-chapter-changed-listener (fun e ->
-      CaptionedBox.set-chapter e#num
+      CaptionedFigure.update-base-num e#num
+    ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedCode.update-base-num e#num
+    ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedTable.update-base-num e#num
     ) in
     let () = Headings.add-chapter-changed-listener (fun e ->
       TableOfContents.add-chapter e#label e#title
@@ -108,6 +117,20 @@ end = struct
   let-block ctx +subsubsection it-title bt-main =
     let label = Label.fresh () in
     Headings.subsubsection-scheme ctx label it-title bt-main
+
+  %% TODO: PDF 以外も受け取れるようにする or PDF のみであることを明示
+  let-block ctx +figure ?:labelopt ?:widthopt path caption =
+    let label = Label.or-fresh labelopt in
+    let width = Option.from (get-text-width ctx *' 0.5) widthopt in
+    CaptionedFigure.pdf-scheme ctx label width path caption
+
+  let-block ctx +code ?:labelopt code caption =
+    let label = Label.or-fresh labelopt in
+    CaptionedCode.scheme ctx label code caption
+
+  let-block ctx +table ?:labelopt ll caption =
+    let label = Label.or-fresh labelopt in
+    CaptionedTable.scheme ctx label ll caption
 
 end
 
