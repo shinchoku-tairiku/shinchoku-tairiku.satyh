@@ -1,23 +1,18 @@
-@require: math
-@require: option
-@require: annot
-@require: code
 @require: hdecoset
 
-@import: graphics
-@import: context
-@import: config
-@import: captioned-box
 @import: bibliography
-@import: table-of-contents
-@import: header
-@import: preface
-@import: headings
-@import: footnote
-@import: theorem
+@import: captioned-box
+@import: config
+@import: context
 @import: flex
-
+@import: footnote
+@import: graphics
+@import: header
+@import: headings
 @import: itemize
+@import: preface
+@import: table-of-contents
+@import: theorem
 
 module ShinchokuTairiku : sig
 

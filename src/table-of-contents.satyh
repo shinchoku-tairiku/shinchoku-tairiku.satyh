@@ -1,5 +1,3 @@
-@import: graphics
-@import: bibliography
 @import: link
 @import: label
 
