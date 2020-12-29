@@ -45,6 +45,7 @@ module ShinchokuTairiku : sig
   direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
   direct +theorem : [inline-text?; label?; inline-text] block-cmd
   direct +proof : [inline-text?; block-text] block-cmd
+  direct +column : [inline-text; block-text] block-cmd
 
 end = struct
 
@@ -197,6 +198,27 @@ end = struct
 
   let-block ctx +proof ?:wordopt inner =
     Theorem.proof-scheme ctx wordopt inner
+
+  let-block ctx +column title inner =
+    let title-scheme ctx =
+      let ctx =
+        ctx
+        |> Context.set-font Config.font-cjk-gothic-bold
+        |> set-font-size Config.font-size-large
+        |> set-paragraph-margin 10pt 10pt
+      in
+      read-inline ctx {コラム:} ++ inline-skip 3pt ++ read-inline ctx title
+      |> line-break true false ctx
+    in
+    let inner-scheme ctx =
+      let ctx = set-paragraph-margin Config.paragraph-margin-top Config.paragraph-margin-bottom ctx in
+      read-block ctx inner
+    in
+    let decoset = VDecoSet.simple-frame-stroke 1pt (Color.gray 0.5) in
+    let pads = (8pt, 8pt, 8pt, 8pt) in
+    let ctx-outer = set-paragraph-margin 20pt 20pt ctx in
+    block-frame-breakable ctx-outer pads decoset
+      (fun ctx -> title-scheme ctx +++ inner-scheme ctx)
 
 end
 
