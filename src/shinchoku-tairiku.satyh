@@ -11,13 +11,13 @@
 @import: captioned-box
 @import: bibliography
 @import: table-of-contents
-@import: command
 @import: side-index
 @import: header
 @import: preface
 @import: headings
 @import: footnote
 @import: theorem
+@import: flex
 
 @import: itemize
 
@@ -46,6 +46,7 @@ module ShinchokuTairiku : sig
   direct +theorem : [inline-text?; label?; inline-text] block-cmd
   direct +proof : [inline-text?; block-text] block-cmd
   direct +column : [inline-text; block-text] block-cmd
+  direct +row : [flex-align?; inline-text list] block-cmd
 
 end = struct
 
@@ -219,6 +220,11 @@ end = struct
     let ctx-outer = set-paragraph-margin 20pt 20pt ctx in
     block-frame-breakable ctx-outer pads decoset
       (fun ctx -> title-scheme ctx +++ inner-scheme ctx)
+
+  %% TODO: rename. like flex
+  let-block ctx +row ?:alignopt its =
+    let align = Option.from SpaceEvenly alignopt in
+    Flex.inline-scheme ctx align its
 
 end
 

@@ -1,17 +1,15 @@
-@import: context
-@import: config
-@import: link
+@require: list
 
-type align =
+type flex-align =
   | Start
   | End
   | Center
   | SpaceBetween
   | SpaceEvenly
 
-module ShinchokuTairikuCmd : sig
+module Flex : sig
 
-  direct +row : [align?; inline-text list] block-cmd
+  val inline-scheme : context -> flex-align -> inline-text list -> block-boxes
 
 end = struct
 
@@ -24,8 +22,7 @@ end = struct
     in
     start ++ f ibs ++ endd
 
-  let-block ctx +row ?:alignopt its =
-    let align = Option.from SpaceEvenly alignopt in
+  let inline-scheme ctx align its =
     let ibs = List.map (read-inline ctx) its in
     let ib =
       match align with
@@ -36,6 +33,5 @@ end = struct
       | SpaceEvenly -> inline-join inline-fil inline-fil inline-fil ibs
     in
     line-break true true ctx ib
-
 
 end
