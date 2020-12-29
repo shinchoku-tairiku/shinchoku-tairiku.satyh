@@ -4,9 +4,9 @@
 @import: context
 @import: page-side
 
-module SideIndex : sig
+module IndexTab : sig
 
-  val make : context -> page-side -> int -> inline-boxes
+  val scheme : context -> page-side -> int -> inline-boxes
 
 end = struct
 
@@ -18,7 +18,7 @@ end = struct
   let draw-rect left right top bottom =
     fill (Color.gray 0.8) (Gr.rectangle-round rect-round (left, top) (right, bottom))
 
-  let draw-chapter ctx side num left right top bottom =
+  let draw-num ctx side num left right top bottom =
     let ctx =
       ctx
       |> set-font-size Config.font-size-huge
@@ -34,7 +34,7 @@ end = struct
     in
     draw-text origin ib
 
-  let make ctx side num =
+  let scheme ctx side num =
     if num == 0 then inline-nil else
 
     let left =
@@ -46,8 +46,8 @@ end = struct
     let top = Config.page-height -' (rect-start +' (rect-height *' float num)) in
     let bottom = top -' rect-height in
 
-    let rect = draw-rect left right top bottom in
-    let chapter = draw-chapter ctx side num left right top bottom in
-    inline-graphics 0pt 0pt 0pt (fun _ -> [rect; chapter])
+    let gr-rect = draw-rect left right top bottom in
+    let gr-num = draw-num ctx side num left right top bottom in
+    inline-graphics 0pt 0pt 0pt (fun _ -> [gr-rect; gr-num])
 
 end
