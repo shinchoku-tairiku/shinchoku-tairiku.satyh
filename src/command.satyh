@@ -11,15 +11,10 @@ type align =
 
 module ShinchokuTairikuCmd : sig
 
-  direct +p : [inline-text] block-cmd
   direct +row : [align?; inline-text list] block-cmd
   direct +column : [inline-text; block-text] block-cmd
 
 end = struct
-
-  let-block ctx +p it =
-    let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in
-    form-paragraph ctx ib
 
   let inline-join start endd delim ibs =
     let-rec f l =

@@ -39,6 +39,7 @@ module ShinchokuTairiku : sig
   direct +subsection : [label?; inline-text; block-text] block-cmd
   %% TODO: add label
   direct +subsubsection : [inline-text; block-text] block-cmd
+  direct +p : [inline-text] block-cmd
   direct +figure : [label?; length?; string; inline-text] block-cmd
   direct +code : [label?; string; inline-text] block-cmd
   direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
@@ -171,6 +172,10 @@ end = struct
   let-block ctx +subsubsection it-title bt-main =
     let label = Label.fresh () in
     Headings.subsubsection-scheme ctx label it-title bt-main
+
+  let-block ctx +p it =
+    let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in
+    form-paragraph ctx ib
 
   %% TODO: PDF 以外も受け取れるようにする or PDF のみであることを明示
   let-block ctx +figure ?:labelopt ?:widthopt path caption =
