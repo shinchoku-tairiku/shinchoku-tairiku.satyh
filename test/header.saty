@@ -1,0 +1,31 @@
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+let-rec block-times ctx n bt =
+  match n with
+  | 0 -> block-nil
+  | _ ->
+    read-block ctx bt +++ block-times ctx (n - 1) bt
+
+let-block ctx +times n bt = block-times ctx n bt
+
+let-block +lorem-ipsum = '<
+  +p{Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.}
+> in
+
+document '<> '<
+  +chapter{with section}{quote}<
+    +section{chapter title page}<
+      +times(4)<+lorem-ipsum;>
+    >
+    +section{cover entire page}<
+      +times(10)<+lorem-ipsum;>
+    >
+    +section{last of chapter}<
+      +times(8)<+lorem-ipsum;>
+    >
+  >
+  +chapter{no section}{quote}<
+    %% TODO: 前章のセクションタイトルが出てしまうので直す
+    +times(8)<+lorem-ipsum;>
+  >
+>

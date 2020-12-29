@@ -4,6 +4,7 @@
 standalone '<
   +p{\emph{abc}}
   +p{footnote\footnote{footnote}footnote}
+  +p{long footnote\footnote{footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote footnote}long footnote}
   +p{\url(`https://example.com`);}
   +p{\code(`code`);}
   +p{line-break\line-break;line-break}

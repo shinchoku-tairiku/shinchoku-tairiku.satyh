@@ -1,0 +1,6 @@
+@require: class-shinchoku-tairiku/shinchoku-tairiku
+
+document '<
+  +p{preface}
+  +p{preface}
+> '<>
