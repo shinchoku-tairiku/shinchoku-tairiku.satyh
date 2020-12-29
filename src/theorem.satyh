@@ -1,3 +1,5 @@
+@require: pervasives
+
 @import: label
 @import: ref-num
 @import: ref-page

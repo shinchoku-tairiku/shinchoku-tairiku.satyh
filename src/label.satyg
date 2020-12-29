@@ -1,3 +1,5 @@
+@require: pervasives
+
 type label = string
 
 module Label : sig
