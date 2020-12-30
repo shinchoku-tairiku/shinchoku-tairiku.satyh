@@ -86,7 +86,7 @@ make test
   - `class-shinchoku-tairiku` のコンポーネント群 (目次や見出しなど) です
   - `block-boxes` あるいは `inline-boxes` を返す `ModuleName.foo-scheme` という名前の関数を持ちます
 - `src/lib/`
-  - class-shinchoku-tairiku 以外でも使える汎用的なライブラリです
+  - `class-shinchoku-tairiku` 以外でも使える汎用的なライブラリです
   - ここにあるモジュールは同じ階層のモジュールあるいは外部パッケージにのみ依存するようにします
 
 ### マニュアルの執筆
