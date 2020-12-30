@@ -5,6 +5,7 @@
 %% モジュールタイプが入ったらこのモジュールは作り直す
 
 module Config : sig
+
   %% size / position
   val page-width    : length
   val page-height   : length
@@ -35,7 +36,9 @@ module Config : sig
   val paragraph-margin-bottom : length
   %% context
   val default-context : length -> context
+
 end = struct
+
   %% B5正寸サイズ + 裁ち落とし
   let page-width    = 188mm
   let page-height   = 263mm
