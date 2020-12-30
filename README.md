@@ -75,6 +75,19 @@ make test
 
 何らかの変更によってテストケースが通らなくなったときは、`${TESTCASE}_actual.pdf` と `${TESTCASE}_diff.pdf` を確認して、問題なさそうであれば `update.sh ${TESTCASE}` を実行して期待する出力結果を更新します。
 
+#### ディレクトリ構造
+
+- `src/shinchoku-tairiku.satyh`
+  - `class-shinchoku-tairiku` のトップレベルです
+  - `document` 関数とすべてのコマンドの定義を含みます
+- `src/config.satyh`
+  - `class-shinchoku-tairiku` の設定値です
+- `src/components/`
+  - `class-shinchoku-tairiku` のコンポーネント群 (目次や見出しなど) です
+  - `block-boxes` あるいは `inline-boxes` を返す `ModuleName.foo-scheme` という名前の関数を持ちます
+- `src/lib/`
+  - class-shinchoku-tairiku 以外でも使える汎用的なライブラリです
+  - ここにあるモジュールは同じ階層のモジュールあるいは外部パッケージにのみ依存するようにします
 
 ### マニュアルの執筆
 
