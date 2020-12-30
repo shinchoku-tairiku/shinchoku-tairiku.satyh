@@ -6,6 +6,8 @@
 @import: config
 @import: link
 @import: label
+@import: ref-num
+@import: ref-page
 
 %% モジュールファンクタが入ったら以下のようなインタフェースにする
 %%
@@ -98,6 +100,8 @@ end
 module CaptionedFigure : sig
 
   val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
   val pdf-scheme : context -> label -> length -> string -> inline-text -> block-boxes
 
 end = struct
@@ -115,6 +119,8 @@ end
 module CaptionedCode : sig
 
   val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
   val scheme : context -> label -> string -> inline-text -> block-boxes
 
 end = struct
@@ -140,6 +146,8 @@ end
 module CaptionedTable : sig
 
   val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
   val scheme : context -> label -> (inline-text list) list -> inline-text -> block-boxes
 
 end = struct

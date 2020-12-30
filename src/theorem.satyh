@@ -8,7 +8,9 @@
 % copied from stdjareport.satyh
 module Theorem : sig
 
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
   val theorem-scheme : context -> label -> inline-text -> inline-text option -> inline-text -> block-boxes
+
   val proof-scheme : context -> inline-text option -> block-text -> block-boxes
 
 end = struct
