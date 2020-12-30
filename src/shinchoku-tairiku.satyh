@@ -9,6 +9,7 @@
 @import: graphics
 @import: header
 @import: headings
+@import: index-tab
 @import: itemize
 @import: preface
 @import: table-of-contents
@@ -72,6 +73,9 @@ end = struct
       TableOfContents.add-subsection e#label e#title
     ) in
     let () = Headings.add-chapter-page-fixed-listener (fun e ->
+      IndexTab.set-num e#num
+    ) in
+    let () = Headings.add-chapter-page-fixed-listener (fun e ->
       Header.set-chapter e#num e#title e#pbinfo#page-number
     ) in
     let () = Headings.add-section-page-fixed-listener (fun e ->
@@ -97,7 +101,7 @@ end = struct
       (|
         header-content = Header.scheme pbinfo#page-number;
         header-origin  = page-shift pbinfo Config.header-origin;
-        footer-content = block-nil;
+        footer-content = IndexTab.scheme ctx pbinfo#page-number;
         footer-origin  = page-shift pbinfo Config.footer-origin;
       |)
     in

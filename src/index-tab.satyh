@@ -6,7 +6,8 @@
 
 module IndexTab : sig
 
-  val scheme : context -> page-side -> int -> inline-boxes
+  val set-num : int -> unit
+  val scheme : context -> int -> block-boxes
 
 end = struct
 
@@ -14,6 +15,11 @@ end = struct
   let rect-height = 25mm
   let rect-round = 3mm
   let rect-start = 35mm
+
+  let-mutable num-ref <- None
+
+  let set-num i =
+    num-ref <- Some i
 
   let draw-rect left right top bottom =
     fill (Color.gray 0.8) (Gr.rectangle-round rect-round (left, top) (right, bottom))
@@ -34,20 +40,23 @@ end = struct
     in
     draw-text origin ib
 
-  let scheme ctx side num =
-    if num == 0 then inline-nil else
+  let scheme ctx pnum =
+    match !num-ref with
+    | None -> block-nil
+    | Some num ->
+      let side = PageSide.of-page-number pnum in
+      let left =
+        match side with
+        | LeftSide -> 0pt -' rect-round
+        | RightSide -> Config.page-width -' (rect-width -' rect-round)
+      in
+      let right = left +' rect-width in
+      let top = Config.page-height -' (rect-start +' (rect-height *' float num)) in
+      let bottom = top -' rect-height in
 
-    let left =
-      match side with
-      | LeftSide -> 0pt -' rect-round
-      | RightSide -> Config.page-width -' (rect-width -' rect-round)
-    in
-    let right = left +' rect-width in
-    let top = Config.page-height -' (rect-start +' (rect-height *' float num)) in
-    let bottom = top -' rect-height in
-
-    let gr-rect = draw-rect left right top bottom in
-    let gr-num = draw-num ctx side num left right top bottom in
-    inline-graphics 0pt 0pt 0pt (fun _ -> [gr-rect; gr-num])
+      let gr-rect = draw-rect left right top bottom in
+      let gr-num = draw-num ctx side num left right top bottom in
+      let ib = inline-graphics 0pt 0pt 0pt (fun _ -> [gr-rect; gr-num]) in
+      line-break true true ctx ib
 
 end

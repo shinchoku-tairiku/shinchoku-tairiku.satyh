@@ -40,7 +40,7 @@ end = struct
   let text-height   = page-height *' 0.8
   let text-origin   = (page-width *' 0.1, page-height *' 0.1)
   let header-width  = page-width *' 0.88
-  let header-origin = (page-width *' 0.06, page-height *' 0.03)
+  let header-origin = (page-width *' 0.06, page-height *' 0.03 +' 10.5pt *' 0.7) %% テストを通すための一時的な調整 (paragraph-margin-top と同じ値) TODO: 印刷版電子版切り替え容易化と一緒に再調整をする
   let footer-width  = page-width *' 0.88
   let footer-origin = (page-width *' 0.06, page-height *' 0.97)
   %% font

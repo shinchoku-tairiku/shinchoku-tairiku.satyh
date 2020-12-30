@@ -1,7 +1,7 @@
 @import: context
 @import: config
 @import: graphics
-@import: index-tab
+@import: page-side
 
 module Header : sig
 
@@ -34,10 +34,6 @@ end = struct
     ++ inline-skip 10pt
     ++ read-inline ctx it-title
 
-  let index-tab-scheme ctx side chapter-num =
-    let ib = IndexTab.scheme ctx side chapter-num in
-    line-break false false ctx ib
-
   let is-header-required pnum chapter-start-pnum =
     not (pnum == chapter-start-pnum)
 
@@ -45,10 +41,9 @@ end = struct
     match !current-chapter-ref with
     | None -> block-nil
     | Some (chapter-num, chapter-title, chapter-start-pnum) ->
-      let ctx = Context.default Config.header-width in
-      let side = PageSide.of-page-number pnum in
-      let bb-index-tab = index-tab-scheme ctx side chapter-num in
       if is-header-required pnum chapter-start-pnum then
+        let ctx = Context.default Config.header-width in
+        let side = PageSide.of-page-number pnum in
         let ib-pnum = read-inline ctx (embed-string (arabic pnum)) in
         let page-part-width = (Config.header-width -' Config.text-width) *' 0.5 in
         let page-skip-width = page-part-width -' get-natural-width ib-pnum in
@@ -68,8 +63,8 @@ end = struct
         let ib-line = inline-fil ++ Graphics.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
         let ctx-line = ctx |> set-paragraph-margin 0pt 0pt in
         let bb-line = line-break false false ctx-line ib-line in
-        bb-index-tab +++ bb-main +++ bb-line
+        bb-main +++ bb-line
       else
-        bb-index-tab
+        block-nil
 
 end
