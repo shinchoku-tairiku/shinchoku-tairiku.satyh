@@ -1,4 +1,8 @@
+@require: math
+
 @import: font
+
+%% モジュールタイプが入ったらこのモジュールは作り直す
 
 module Config : sig
   %% size / position
@@ -29,6 +33,8 @@ module Config : sig
   val leading-space : length
   val paragraph-margin-top : length
   val paragraph-margin-bottom : length
+  %% context
+  val default-context : length -> context
 end = struct
   %% B5正寸サイズ + 裁ち落とし
   let page-width    = 188mm
@@ -63,4 +69,18 @@ end = struct
   let leading-space = font-size-normal *' 1.4
   let paragraph-margin-top = font-size-normal *' 0.7
   let paragraph-margin-bottom = paragraph-margin-top
+  %% context
+  let default-context width =
+    get-initial-context width (command \math)
+    |> set-dominant-wide-script Kana
+    |> set-language Kana Japanese
+    |> set-language HanIdeographic Japanese
+    |> set-dominant-narrow-script Latin
+    |> set-language Latin English
+    |> Context.set-font font-cjk-mincho
+    |> set-font-size Config.font-size-normal
+    |> set-leading Config.leading-space
+    |> set-min-paragraph-ascender-and-descender 0pt 0pt
+    |> set-paragraph-margin paragraph-margin-top paragraph-margin-bottom
+
 end

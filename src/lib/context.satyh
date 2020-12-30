@@ -1,0 +1,24 @@
+@import: font
+
+module Context : sig
+
+  val set-latin-font : font -> context -> context
+  val set-cjk-font : font -> context -> context
+  val set-font : font -> context -> context
+
+end = struct
+
+  let set-latin-font = set-font Latin
+
+  let set-cjk-font font ctx =
+    ctx
+    |> set-font HanIdeographic font
+    |> set-font Kana font
+    |> set-font OtherScript font
+
+  let set-font font ctx =
+    ctx
+    |> set-cjk-font font
+    |> set-latin-font font
+
+end

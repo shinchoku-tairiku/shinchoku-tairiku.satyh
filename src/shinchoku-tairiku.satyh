@@ -1,19 +1,17 @@
 @require: hdecoset
 
-@import: bibliography
-@import: captioned-box
+@import: components/bibliography
+@import: components/captioned-box
+@import: components/flex
+@import: components/footnote
+@import: components/header
+@import: components/headings
+@import: components/index-tab
+@import: components/itemize
+@import: components/preface
+@import: components/table-of-contents
+@import: components/theorem
 @import: config
-@import: context
-@import: flex
-@import: footnote
-@import: graphics
-@import: header
-@import: headings
-@import: index-tab
-@import: itemize
-@import: preface
-@import: table-of-contents
-@import: theorem
 
 module ShinchokuTairiku : sig
 
@@ -51,7 +49,7 @@ end = struct
 
   let document preface inner =
     %% initial context
-    let ctx = Context.default Config.text-width in
+    let ctx = Config.default-context Config.text-width in
     %% module settings
     let () = Footnote.initialize () in
     let () = Headings.add-chapter-changed-listener (fun e ->
