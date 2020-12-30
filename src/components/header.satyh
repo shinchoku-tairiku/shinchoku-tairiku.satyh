@@ -1,7 +1,7 @@
-@import: context
-@import: config
-@import: graphics
-@import: page-side
+@import: ../config
+@import: ../lib/context
+@import: ../lib/graphics
+@import: ../lib/page-side
 
 module Header : sig
 

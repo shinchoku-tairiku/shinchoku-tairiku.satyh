@@ -1,8 +1,8 @@
 @require: gr
 
-@import: config
-@import: context
-@import: page-side
+@import: ../config
+@import: ../lib/context
+@import: ../lib/page-side
 
 module IndexTab : sig
 

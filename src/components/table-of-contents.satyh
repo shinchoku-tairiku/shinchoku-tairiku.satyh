@@ -1,5 +1,9 @@
-@import: link
-@import: label
+@import: ../config
+@import: ../lib/context
+@import: ../lib/label
+@import: ../lib/link
+@import: ../lib/ref-num
+@import: ../lib/ref-page
 
 module TableOfContents : sig
 

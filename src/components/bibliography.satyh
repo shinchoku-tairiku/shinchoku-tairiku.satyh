@@ -1,8 +1,8 @@
 @require: pervasives
 
-@import: context
-@import: config
-@import: link
+@import: ../config
+@import: ../lib/context
+@import: ../lib/link
 
 type bib-item-article =
   (|

@@ -1,9 +1,11 @@
 @require: pervasives
 
-@import: label
-@import: ref-num
-@import: ref-page
-@import: link
+@import: ../config
+@import: ../lib/context
+@import: ../lib/label
+@import: ../lib/ref-num
+@import: ../lib/ref-page
+@import: ../lib/link
 
 % copied from stdjareport.satyh
 module Theorem : sig

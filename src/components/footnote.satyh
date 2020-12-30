@@ -1,5 +1,7 @@
 @require: footnote-scheme
 
+@import: ../config
+
 module Footnote : sig
 
   val scheme : context -> inline-text -> inline-boxes

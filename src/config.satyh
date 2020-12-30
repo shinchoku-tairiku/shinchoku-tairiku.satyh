@@ -1,6 +1,6 @@
 @require: math
 
-@import: font
+@import: lib/font
 
 %% モジュールタイプが入ったらこのモジュールは作り直す
 
@@ -78,8 +78,8 @@ end = struct
     |> set-dominant-narrow-script Latin
     |> set-language Latin English
     |> Context.set-font font-cjk-mincho
-    |> set-font-size Config.font-size-normal
-    |> set-leading Config.leading-space
+    |> set-font-size font-size-normal
+    |> set-leading leading-space
     |> set-min-paragraph-ascender-and-descender 0pt 0pt
     |> set-paragraph-margin paragraph-margin-top paragraph-margin-bottom
 

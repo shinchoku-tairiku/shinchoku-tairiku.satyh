@@ -2,12 +2,12 @@
 @require: code
 @require: list
 
-@import: context
-@import: config
-@import: link
-@import: label
-@import: ref-num
-@import: ref-page
+@import: ../config
+@import: ../lib/context
+@import: ../lib/label
+@import: ../lib/link
+@import: ../lib/ref-num
+@import: ../lib/ref-page
 
 %% モジュールファンクタが入ったら以下のようなインタフェースにする
 %%

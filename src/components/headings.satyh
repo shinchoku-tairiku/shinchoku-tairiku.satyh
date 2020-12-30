@@ -1,10 +1,10 @@
 @require: pervasives
 
-@import: config
-@import: context
-@import: event-listeners
-@import: ref-num
-@import: ref-page
+@import: ../config
+@import: ../lib/context
+@import: ../lib/event-listeners
+@import: ../lib/ref-num
+@import: ../lib/ref-page
 
 type 'n heading-changed-event = (|
   label : label;
