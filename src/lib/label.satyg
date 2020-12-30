@@ -9,17 +9,17 @@ module Label : sig
 
 end = struct
 
-  let or-fresh =
+  let fresh =
     let-mutable count <- 0 in
-    let or opt =
-      match opt with
-      | None ->
-        let () = increment count in
-        `generated:` ^ arabic !count
-      | Some l -> l
+    let f () =
+      let () = increment count in
+      `generated:` ^ arabic !count
     in
-    or
+    f
 
-  let fresh () = or-fresh None
+  let or-fresh labelopt =
+    match labelopt with
+    | None -> fresh ()
+    | Some l -> l
 
 end
