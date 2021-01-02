@@ -41,7 +41,7 @@ module Bibliography : sig
 
 end = struct
 
-  let to-key label = `shinchoku-tairiku:bib:` ^ label ^ `:num`
+  let to-key label = `bibliography:num:key:` ^ label
 
   let-mutable bib-number-ref <- 0
   let set-bib-number label =
