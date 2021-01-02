@@ -9,7 +9,7 @@ module RefPage : sig
 end = struct
 
   let make-key label =
-    `shinchoku-tairiku:` ^ label ^ `:page`
+    `ref-page:key:` ^ label
 
   let get label =
     match make-key label |> get-cross-reference with

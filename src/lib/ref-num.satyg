@@ -8,7 +8,7 @@ module RefNum : sig
 end = struct
 
   let make-key label =
-    `shinchoku-tairiku:` ^ label ^ `:num`
+    `ref-num:key:` ^ label
 
   let get label =
     match make-key label |> get-cross-reference with
