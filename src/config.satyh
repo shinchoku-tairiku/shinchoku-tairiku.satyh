@@ -1,6 +1,11 @@
-@import: util
+@require: math
+
+@import: lib/font
+
+%% モジュールタイプが入ったらこのモジュールは作り直す
 
 module Config : sig
+
   %% size / position
   val page-width    : length
   val page-height   : length
@@ -29,7 +34,11 @@ module Config : sig
   val leading-space : length
   val paragraph-margin-top : length
   val paragraph-margin-bottom : length
+  %% context
+  val default-context : length -> context
+
 end = struct
+
   %% B5正寸サイズ + 裁ち落とし
   let page-width    = 188mm
   let page-height   = 263mm
@@ -40,7 +49,7 @@ end = struct
   let text-height   = page-height *' 0.8
   let text-origin   = (page-width *' 0.1, page-height *' 0.1)
   let header-width  = page-width *' 0.88
-  let header-origin = (page-width *' 0.06, page-height *' 0.03)
+  let header-origin = (page-width *' 0.06, page-height *' 0.03 +' 10.5pt *' 0.7) %% テストを通すための一時的な調整 (paragraph-margin-top と同じ値) TODO: 印刷版電子版切り替え容易化と一緒に再調整をする
   let footer-width  = page-width *' 0.88
   let footer-origin = (page-width *' 0.06, page-height *' 0.97)
   %% font
@@ -63,4 +72,18 @@ end = struct
   let leading-space = font-size-normal *' 1.4
   let paragraph-margin-top = font-size-normal *' 0.7
   let paragraph-margin-bottom = paragraph-margin-top
+  %% context
+  let default-context width =
+    get-initial-context width (command \math)
+    |> set-dominant-wide-script Kana
+    |> set-language Kana Japanese
+    |> set-language HanIdeographic Japanese
+    |> set-dominant-narrow-script Latin
+    |> set-language Latin English
+    |> Context.set-font font-cjk-mincho
+    |> set-font-size font-size-normal
+    |> set-leading leading-space
+    |> set-min-paragraph-ascender-and-descender 0pt 0pt
+    |> set-paragraph-margin paragraph-margin-top paragraph-margin-bottom
+
 end

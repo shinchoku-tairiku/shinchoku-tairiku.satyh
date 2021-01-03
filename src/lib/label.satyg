@@ -1,0 +1,25 @@
+@require: pervasives
+
+type label = string
+
+module Label : sig
+
+  val fresh : unit -> label
+  val or-fresh : label option -> label
+
+end = struct
+
+  let fresh =
+    let-mutable count <- 0 in
+    let f () =
+      let () = increment count in
+      `generated:` ^ arabic !count
+    in
+    f
+
+  let or-fresh labelopt =
+    match labelopt with
+    | None -> fresh ()
+    | Some l -> l
+
+end

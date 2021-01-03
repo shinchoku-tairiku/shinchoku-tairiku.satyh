@@ -1,0 +1,17 @@
+@require: gr
+
+module Graphics : sig
+
+  val draw-horizontal-line : length ?-> color ?-> length -> length -> length -> inline-boxes
+
+end = struct
+
+  let draw-horizontal-line ?:topt ?:coloropt width margin-top margin-bottom =
+    let t = Option.from 0.5pt topt in
+    let color = Option.from Color.black coloropt in
+    let stroke-line (x, y) =
+      [ stroke t color (Gr.line (x, y) (x +' width, y)) ]
+    in
+    inline-graphics width margin-top margin-bottom stroke-line
+
+end

@@ -1,149 +1,267 @@
-@require: math
-@require: option
-@require: annot
-@require: footnote-scheme
-@require: code
 @require: hdecoset
 
-@import: util
-@import: context
+@import: components/bibliography
+@import: components/captioned-box
+@import: components/flex
+@import: components/footnote
+@import: components/header
+@import: components/headings
+@import: components/index-tab
+@import: components/itemize
+@import: components/preface
+@import: components/table-of-contents
+@import: components/theorem
 @import: config
-@import: captioned-box
-@import: bibliography
-@import: table-of-contents
-@import: command
-@import: side-index
-
-@import: itemize
 
 module ShinchokuTairiku : sig
 
   val document : block-text -> block-text -> document
 
+  direct \cite : [label] inline-cmd
+  direct \footnote : [inline-text] inline-cmd
+  direct \emph : [inline-text] inline-cmd
+  direct \url : [string] inline-cmd
+  direct \minipage : [float; block-text] inline-cmd
+  direct \code : [string] inline-cmd
+  direct \line-break : [] inline-cmd
+  direct \ref : [label] inline-cmd
+  direct \listing : [bool?; itemize] inline-cmd
+  direct \enumerate : [itemize] inline-cmd
+
+  direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
+  direct +section : [label?; inline-text; block-text] block-cmd
+  direct +subsection : [label?; inline-text; block-text] block-cmd
+  direct +subsubsection : [label?; inline-text; block-text] block-cmd
+  direct +p : [inline-text] block-cmd
+  direct +figure : [label?; length?; string; inline-text] block-cmd
+  direct +code : [label?; string; inline-text] block-cmd
+  direct +table : [label?; (inline-text list) list; inline-text ] block-cmd
+  direct +theorem : [inline-text?; label?; inline-text] block-cmd
+  direct +proof : [inline-text?; block-text] block-cmd
+  direct +column : [inline-text; block-text] block-cmd
+  direct +row : [flex-align?; inline-text list] block-cmd
+  direct +listing : [bool?; itemize] block-cmd
+  direct +enumerate : [itemize] block-cmd
+
 end = struct
 
-  let get-default-context width =
-    get-initial-context width (command \math)
-    |> set-dominant-wide-script Kana
-    |> set-language Kana Japanese
-    |> set-language HanIdeographic Japanese
-    |> set-dominant-narrow-script Latin
-    |> set-language Latin English
-    |> Context.set-font Config.font-cjk-mincho
-    |> set-font-size Config.font-size-normal
-    |> set-leading Config.leading-space
-    |> set-min-paragraph-ascender-and-descender 0pt 0pt
-    |> set-paragraph-margin Config.paragraph-margin-top Config.paragraph-margin-bottom
-
-  let make-preface ctx inner =
-    let ctx-title =
-      ctx
-      |> Context.set-font Config.font-cjk-gothic-bold
-      |> set-font-size 24pt
-      |> set-paragraph-margin 30pt 30pt
-    in
-    let bb-title =
-      inline-fil ++ read-inline ctx-title {はじめに}
-      |> line-break false false ctx-title
-    in
-    let bb-inner = read-block ctx inner in
-    bb-title +++ bb-inner +++ block-skip 30pt
-
-  let-mutable current-chapter-ref <- (0, 0, {})
-  let-mutable current-section-ref <- (0, 0, {})
-  let set-current-chapter pnum num title =
-    current-chapter-ref <- (pnum, num, title)
-  let set-current-section pnum num title =
-    current-section-ref <- (pnum, num, title)
-
-  let make-side-index ctx side =
-    let (_, num, _) = !current-chapter-ref in
-    let ib = SideIndex.make ctx side num in
-    line-break false false ctx ib
-
-  let make-chapter-title ctx =
-    let (_, num, it-title) = !current-chapter-ref in
-    let it-num = embed-string (`第` ^ arabic num ^ `章`) in
-    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
-    read-inline ctx it-num
-    ++ inline-skip 10pt
-    ++ read-inline ctx it-title
-
-  let make-section-title ctx =
-    let (_, chapter-num, _) = !current-chapter-ref in
-    let (_, section-num, it-title) = !current-section-ref in
-    let it-num = embed-string (arabic chapter-num ^ `.` ^ arabic section-num) in
-    let ctx = Context.set-font Config.font-cjk-gothic-bold ctx in
-    read-inline ctx it-num
-    ++ inline-skip 10pt
-    ++ read-inline ctx it-title
-
-  let make-header pnum =
-    let ctx = get-default-context Config.header-width in
-    let side = PageSide.of-page-number pnum in
-    let bb-side-index = make-side-index ctx side in
-    let (chapter-pnum, chapter-num, _) = !current-chapter-ref in
-    if chapter-pnum == 0 || chapter-pnum == pnum then bb-side-index else
-    let ib-pnum = read-inline ctx (embed-string (arabic pnum)) in
-    let page-part-width = (Config.header-width -' Config.text-width) *' 0.5 in
-    let page-skip-width = page-part-width -' get-natural-width ib-pnum in
-    let ib-main =
-      match side with
-      | LeftSide ->
-        let ib = make-chapter-title ctx in
-        ib-pnum ++ inline-skip page-skip-width ++ ib ++ inline-fil
-      | RightSide ->
-        let ib = make-section-title ctx in
-        inline-fil ++ ib ++ inline-skip page-skip-width ++ ib-pnum
-    in
-    let ctx-main = ctx |> set-paragraph-margin 0pt 5pt in
-    let bb-main = line-break false false ctx-main ib-main in
-    let ib-line = inline-fil ++ Util.draw-horizontal-line Config.text-width 0pt 0pt ++ inline-fil in
-    let ctx-line = ctx |> set-paragraph-margin 0pt 0pt in
-    let bb-line = line-break false false ctx-line ib-line in
-    bb-side-index +++ bb-main +++ bb-line
-
-  let make-footer = block-nil
-
-  let page-shift pginfo (x, y) =
+  let page-shift pbinfo (x, y) =
     let l = 3mm in
-    match PageSide.of-page-number pginfo#page-number with
+    match PageSide.of-page-number pbinfo#page-number with
     | LeftSide -> (x -' 10pt, y)
     | RightSide -> (x +' 10pt, y)
 
   let document preface inner =
     %% initial context
-    let ctx = get-default-context Config.text-width in
+    let ctx = Config.default-context Config.text-width in
     %% module settings
-    let () = ShinchokuTairikuToc.register-chapter-hook CaptionedBox.set-chapter in
-    let () = ShinchokuTairikuToc.register-page-chapter-hook set-current-chapter in
-    let () = ShinchokuTairikuToc.register-page-section-hook set-current-section in
+    let () = Footnote.initialize () in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedFigure.update-base-num e#num
+    ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedCode.update-base-num e#num
+    ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      CaptionedTable.update-base-num e#num
+    ) in
+    let () = Headings.add-chapter-changed-listener (fun e ->
+      TableOfContents.add-chapter e#label e#title
+    ) in
+    let () = Headings.add-section-changed-listener (fun e ->
+      TableOfContents.add-section e#label e#title
+    ) in
+    let () = Headings.add-subsection-changed-listener (fun e ->
+      TableOfContents.add-subsection e#label e#title
+    ) in
+    let () = Headings.add-chapter-page-fixed-listener (fun e ->
+      IndexTab.set-num e#num
+    ) in
+    let () = Headings.add-chapter-page-fixed-listener (fun e ->
+      Header.set-chapter e#num e#title e#pbinfo#page-number
+    ) in
+    let () = Headings.add-section-page-fixed-listener (fun e ->
+      %% NOTE: `let (_, num) = e#num in` を外にくくりだすと parse error
+      Header.set-section (let (_, num) = e#num in num) e#title e#pbinfo#page-number
+    ) in
     %% -- preface --
-    let bb-preface = make-preface ctx preface in
+    let bb-preface = Preface.scheme ctx preface in
     %% -- main --
     let bb-main = read-block ctx inner in
     %% -- table of contents --
     %% this must be after processing bb-main
-    let bb-toc = ShinchokuTairikuToc.make ctx in
+    let bb-toc = TableOfContents.scheme ctx in
     %% -- page settings --
-    let pagecontf pginfo =
-      let () = FootnoteScheme.start-page () in
+    let pagecontf pbinfo =
+      let () = Footnote.start-page () in
       (|
         text-height = Config.text-height;
-        text-origin = page-shift pginfo Config.text-origin;
+        text-origin = page-shift pbinfo Config.text-origin;
       |)
     in
-    let pagepartsf pginfo =
+    let pagepartsf pbinfo =
       (|
-        header-content = make-header pginfo#page-number;
-        header-origin  = page-shift pginfo Config.header-origin;
-        footer-content = make-footer;
-        footer-origin  = page-shift pginfo Config.footer-origin;
+        header-content = Header.scheme pbinfo#page-number;
+        header-origin  = page-shift pbinfo Config.header-origin;
+        footer-content = IndexTab.scheme ctx pbinfo#page-number;
+        footer-origin  = page-shift pbinfo Config.footer-origin;
       |)
     in
     let page = UserDefinedPaper (Config.page-width, Config.page-height) in
     let bb = bb-preface +++ bb-toc +++ bb-main in
     page-break page pagecontf pagepartsf bb
+
+  %%
+  %% inline commands
+  %%
+
+  let-inline ctx \cite label =
+    Bibliography.cite-scheme ctx label
+
+  let-inline ctx \footnote it =
+    Footnote.scheme ctx it
+
+  let-inline ctx \emph it =
+    let ctx = Context.set-font Config.font-cjk-gothic ctx in
+    read-inline ctx it
+
+  let-inline ctx \url url =
+    let ctx = Context.set-latin-font Config.font-mono ctx in
+    read-inline ctx {\href(url)(embed-string url);}
+
+  let-inline ctx \code code =
+    let pads = (4pt, 4pt, 4pt, 4pt) in
+    let decoset = HDecoSet.rectangle-round-fill 2pt 2pt (Color.gray 0.95) in
+    let ctx = Context.set-latin-font Config.font-mono ctx in
+    let ib =
+      embed-string code
+      |> read-inline ctx
+      |> inline-frame-breakable pads decoset
+    in
+    script-guard Latin ib
+
+  let-inline ctx \minipage ratio inner =
+    let width = get-text-width ctx *' ratio in
+    embed-block-top ctx width (fun ctx -> read-block ctx inner)
+
+  let-inline ctx \line-break =
+    discretionary (0 - 10000) inline-nil inline-fil inline-nil
+
+  let-inline ctx \ref label =
+    RefNum.get label
+    |> embed-string
+    |> read-inline ctx
+    |> Link.to label
+
+  let-inline ctx \listing ?:breakopt item =
+    let break = Option.from false breakopt in
+    let ib =
+      Itemize.listing-scheme ctx break item
+      |> embed-block-breakable ctx
+    in
+    inline-fil ++ ib
+
+  let-inline ctx \enumerate item =
+    %% NOTE: block-skip 0pt を入れるとマージンが変わる
+    %% オリジナルの挙動を変えないために入れている
+    let ib =
+      block-skip 0pt +++ Itemize.enumerate-scheme ctx item +++ block-skip 0pt
+      |> embed-block-breakable ctx
+    in
+    inline-fil ++ ib
+
+  %%
+  %% block commands
+  %%
+
+  %% copied from satysfi-base
+  let-block ctx +eval-const bb = bb
+
+  let-block ctx +chapter ?:labelopt ?:bib-itemsopt it-title it-quote bt-main =
+    let label = Label.or-fresh labelopt in
+    let bb-chapter = Headings.chapter-scheme ctx label it-title it-quote bt-main in
+    %% bibliography
+    let bib-items = Option.from [] bib-itemsopt in
+    let bb-bib =
+      match bib-items with
+      | [] -> block-nil
+      | _ ->
+        let bib-label = Label.fresh () in
+        let bb-content = Bibliography.scheme ctx bib-items in
+        Headings.section-scheme ctx bib-label {参考文献} '<+eval-const(bb-content);>
+    in
+    %% finalize
+    bb-chapter +++ bb-bib
+
+  let-block ctx +section ?:labelopt it-title bt-main =
+    let label = Label.or-fresh labelopt in
+    Headings.section-scheme ctx label it-title bt-main
+
+  let-block ctx +subsection ?:labelopt it-title bt-main =
+    let label = Label.or-fresh labelopt in
+    Headings.subsection-scheme ctx label it-title bt-main
+
+  let-block ctx +subsubsection ?:labelopt it-title bt-main =
+    let label = Label.or-fresh labelopt in
+    Headings.subsubsection-scheme ctx label it-title bt-main
+
+  let-block ctx +p it =
+    let ib = inline-skip 10pt ++ read-inline ctx it ++ inline-fil in
+    line-break true true ctx ib
+
+  %% TODO: PDF 以外も受け取れるようにする or PDF のみであることを明示
+  let-block ctx +figure ?:labelopt ?:widthopt path caption =
+    let label = Label.or-fresh labelopt in
+    let width = Option.from (get-text-width ctx *' 0.5) widthopt in
+    CaptionedFigure.pdf-scheme ctx label width path caption
+
+  let-block ctx +code ?:labelopt code caption =
+    let label = Label.or-fresh labelopt in
+    CaptionedCode.scheme ctx label code caption
+
+  let-block ctx +table ?:labelopt ll caption =
+    let label = Label.or-fresh labelopt in
+    CaptionedTable.scheme ctx label ll caption
+
+  let-block ctx +theorem ?:wordopt ?:labelopt inner =
+    let label = Label.or-fresh (Option.map (fun l -> `theorem:` ^ l) labelopt) in
+    Theorem.theorem-scheme ctx label {Theorem} wordopt inner
+
+  let-block ctx +proof ?:wordopt inner =
+    Theorem.proof-scheme ctx wordopt inner
+
+  let-block ctx +column title inner =
+    let title-scheme ctx =
+      let ctx =
+        ctx
+        |> Context.set-font Config.font-cjk-gothic-bold
+        |> set-font-size Config.font-size-large
+        |> set-paragraph-margin 10pt 10pt
+      in
+      read-inline ctx {コラム:} ++ inline-skip 3pt ++ read-inline ctx title
+      |> line-break true false ctx
+    in
+    let inner-scheme ctx =
+      let ctx = set-paragraph-margin Config.paragraph-margin-top Config.paragraph-margin-bottom ctx in
+      read-block ctx inner
+    in
+    let decoset = VDecoSet.simple-frame-stroke 1pt (Color.gray 0.5) in
+    let pads = (8pt, 8pt, 8pt, 8pt) in
+    let ctx-outer = set-paragraph-margin 20pt 20pt ctx in
+    block-frame-breakable ctx-outer pads decoset
+      (fun ctx -> title-scheme ctx +++ inner-scheme ctx)
+
+  %% TODO: rename. like flex
+  let-block ctx +row ?:alignopt its =
+    let align = Option.from SpaceEvenly alignopt in
+    Flex.inline-scheme ctx align its
+
+  let-block ctx +listing ?:breakopt item =
+    let break = Option.from false breakopt in
+    Itemize.listing-scheme ctx break item
+
+  let-block ctx +enumerate item =
+    Itemize.enumerate-scheme ctx item
 
 end
 

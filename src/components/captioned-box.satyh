@@ -1,0 +1,181 @@
+@require: pervasives
+@require: code
+@require: list
+
+@import: ../config
+@import: ../lib/context
+@import: ../lib/label
+@import: ../lib/link
+@import: ../lib/ref-num
+@import: ../lib/ref-page
+
+%% モジュールファンクタが入ったら以下のようなインタフェースにする
+%%
+%% module type CaptionConfig = sig
+%%   val kind : inline-text
+%% end
+%%
+%% module Caption (config : CaptionConfig) : sig
+%%   val update-base-num : int -> unit
+%%   val scheme : context -> label -> inline-text -> block-boxes -> block-boxes
+%% end = struct
+%%   let-mutable base-num-ref <- 0
+%%   let-mutable num-ref <- 0
+%%   let update-base-num n =
+%%     base-num-ref <- n
+%%     num-ref <- 0
+%%   ...
+%% end
+%%
+%% module Figure = Caption (struct let kind = {図} end)
+%% module Code = Caption (struct let kind = {コード} end)
+%% module Table = Caption (struct let kind = {テーブル} end)
+
+module Caption : sig
+
+  %% e.g., scheme ctx `label` {図} 1 2 {なにかの図} ...
+  %%
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
+  val scheme : context -> label -> inline-text -> int -> int -> inline-text -> inline-boxes -> block-boxes
+
+  %% TODO: モジュールファンクタが入ったら以下は必要なくなる
+  val setup-num-ref : unit -> (int ref * int ref * (int -> unit))
+
+end = struct
+
+  let inner-margin = 8pt
+  let outer-margin = 20pt
+
+  let scheme ctx label kind base-num kind-num caption ib-main =
+    %% main
+    let ctx-main =
+      ctx
+      |> set-paragraph-margin outer-margin inner-margin
+    in
+    let bb-main =
+      inline-fil ++ ib-main ++ inline-fil
+      |> line-break true false ctx-main
+    in
+    %% caption
+    let num = arabic base-num ^ `.` ^ arabic kind-num in
+    let () = RefNum.set label num in
+    let it-num = embed-string num in
+    let ctx-caption =
+      ctx
+      |> Context.set-font Config.font-cjk-gothic
+      |> set-font-size Config.font-size-small
+      |> set-paragraph-margin inner-margin outer-margin
+    in
+    %% NOTE: これはキャプションの位置ではなく内容の位置に設定したいが、
+    %% キャプションは line-break false なので内容とキャプションのページが離れることはない
+    let page-hook pbinfo _ =
+      RefPage.set label pbinfo#page-number
+    in
+    let ib-caption =
+      read-inline (ctx-caption |> set-text-color (Color.gray 0.5)) {▶}
+      ++ read-inline ctx-caption {#kind;#it-num;}
+      ++ inline-skip 10pt
+      ++ read-inline ctx-caption caption
+      ++ hook-page-break page-hook
+    in
+    let bb-caption =
+      inline-fil ++ ib-caption ++ inline-fil
+      |> line-break false true ctx-caption
+    in
+    %% finalize
+    bb-main +++ bb-caption
+    |> Link.set-block ctx label
+
+  let setup-num-ref () =
+    let-mutable base-num-ref <- 0 in
+    let-mutable kind-num-ref <- 0 in
+    let update-base-num n =
+      let () = base-num-ref <- n in
+      kind-num-ref <- 0
+    in
+    (base-num-ref, kind-num-ref, update-base-num)
+
+end
+
+module CaptionedFigure : sig
+
+  val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
+  val pdf-scheme : context -> label -> length -> string -> inline-text -> block-boxes
+
+end = struct
+
+  let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
+
+  let pdf-scheme ctx label width path caption =
+    let () = increment kind-num-ref in
+    let pdf = load-pdf-image path 1 in
+    let ib-image = use-image-by-width pdf width in
+    Caption.scheme ctx label {図} !base-num-ref !kind-num-ref caption ib-image
+
+end
+
+module CaptionedCode : sig
+
+  val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
+  val scheme : context -> label -> string -> inline-text -> block-boxes
+
+end = struct
+
+  let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
+
+  let scheme ctx label code caption =
+    let () = increment kind-num-ref in
+    let ctx-code =
+      ctx
+      |> set-paragraph-margin 0pt 0pt
+      |> set-font-size Config.font-size-small
+      |> set-leading (Config.font-size-small *' 1.25)
+      |> Context.set-font Config.font-cjk-gothic
+    in
+    let decoset = VDecoSet.simple-frame 1pt (Color.gray 0.6) (Color.gray 0.9) in
+    let bb-code = Code.scheme decoset Color.black ctx-code code in
+    let ib-code = embed-block-breakable ctx bb-code in
+    Caption.scheme ctx label {コード} !base-num-ref !kind-num-ref caption ib-code
+
+end
+
+module CaptionedTable : sig
+
+  val update-base-num : int -> unit
+
+  %% 指定したラベルで RefNum, RefPage, Link が設定される
+  val scheme : context -> label -> (inline-text list) list -> inline-text -> block-boxes
+
+end = struct
+
+  let (base-num-ref, kind-num-ref, update-base-num) = Caption.setup-num-ref ()
+
+  let scheme ctx label ll caption =
+    let () = increment kind-num-ref in
+    let pads = (6pt, 6pt, 6pt, 6pt) in
+    let l it = read-inline ctx it ++ inline-fil in
+    let cellss = List.map (List.map (fun it -> NormalCell (pads, l it))) ll in
+    let grf xs ys =
+      let thin = stroke 0.5pt Color.black in
+      let vlines =
+        match (ys, List.reverse ys) with
+        | (ys :: _, ye :: _) ->
+          List.map (fun x -> thin (Gr.line (x, ys) (x, ye))) xs
+        | _ -> []
+      in
+      let hlines =
+        match (xs, List.reverse xs) with
+        | (xs :: _, xe :: _) ->
+          List.map (fun y -> thin (Gr.line (xs, y) (xe, y))) ys
+        | _ -> []
+      in
+      List.append vlines hlines
+    in
+    let ib = tabular cellss grf in
+    Caption.scheme ctx label {表} !base-num-ref !kind-num-ref caption ib
+
+end

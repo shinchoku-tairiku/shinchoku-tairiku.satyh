@@ -1,0 +1,22 @@
+@import: label
+
+module RefNum : sig
+
+  val get : label -> string
+  val set : label -> string -> unit
+
+end = struct
+
+  let make-key label =
+    `ref-num:key:` ^ label
+
+  let get label =
+    match make-key label |> get-cross-reference with
+    | None -> `?`
+    | Some n -> n
+
+  let set label num =
+    let key = make-key label in
+    register-cross-reference key num
+
+end

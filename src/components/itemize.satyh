@@ -1,0 +1,111 @@
+@require: pervasives
+@require: list
+@require: option
+@require: gr
+
+% item 間の幅を調節するために仕方なく本家からコピペしてきたモジュール
+% original: https://github.com/gfngfn/SATySFi/blob/4d1e62da212cba47b0201e7bb38028b9cc5d5ea1/lib-satysfi/dist/packages/itemize.satyh
+% 以下の調整を入れている
+% - item-gap を 10pt から 6pt に変更
+% - item-gap-outer を削除 (0pt に)
+% - コマンドの定義を shinchoku-tairiku.satyh に移動
+% - インデント調整
+
+module Itemize : sig
+
+  val listing-scheme : context -> bool -> itemize -> block-boxes
+  val enumerate-scheme : context -> itemize -> block-boxes
+
+end = struct
+
+  let (+++>) = List.fold-left (+++)
+
+  let item-indent = 16pt
+  let item-gap = 6pt % original: 10pt
+
+  %%
+  %% listing
+  %%
+
+  let bullet color (x, y) =
+    let cx = x +' 4pt in
+    let cy = y +' 4pt in
+    let r = 2pt in
+    [ fill color (Gr.circle (cx, cy) r); ]
+
+  let-rec listing-item : context -> int -> itemize -> block-boxes
+    | ctx depth (Item(parent, children)) =
+      let color = get-text-color ctx in
+      let ib-bullet = inline-graphics 8pt 8pt 0pt (bullet color) ++ inline-skip 8pt in
+      let bullet-width = get-natural-width ib-bullet in
+      let parent-indent = item-indent *' (float depth) in
+      let ib-parent =
+        embed-block-top ctx ((get-text-width ctx) -' parent-indent -' bullet-width) (fun ctx ->
+          form-paragraph (ctx |> set-paragraph-margin item-gap item-gap)
+            (read-inline ctx parent ++ inline-fil)
+        )
+      in
+      let bb-parent =
+        form-paragraph (ctx |> set-paragraph-margin item-gap item-gap)
+          ((inline-skip parent-indent) ++ ib-bullet ++ ib-parent)
+      in
+      let bblst-children = List.map (listing-item ctx (depth + 1)) children in
+      bb-parent +++> bblst-children
+
+  let-rec listing-item-breakable
+    | ctx depth (Item(parent, children)) =
+      let color = get-text-color ctx in
+      let ib-bullet = inline-graphics 8pt 8pt 0pt (bullet color) ++ inline-skip 8pt in
+      let bullet-width = get-natural-width ib-bullet in
+      let parent-indent = item-indent *' (float depth) in
+      let pads = (parent-indent +' bullet-width, 0pt, 0pt, 0pt) in
+      let decos =
+        let deco _ _ _ _ = [] in
+          (deco, deco, deco, deco)
+      in
+      let bb-parent =
+        block-nil +++> [
+          block-frame-breakable (ctx |> set-paragraph-margin item-gap item-gap) pads decos (fun ctx ->
+            form-paragraph ctx
+              (inline-skip (0pt -' bullet-width) ++ ib-bullet
+                ++ read-inline ctx parent ++ inline-fil)
+          );
+        ]
+      in
+      let bblst-children = List.map (listing-item-breakable ctx (depth + 1)) children in
+      bb-parent +++> bblst-children
+
+  let listing-scheme ctx break (Item(_, itmzlst)) =
+    let item-scheme = if break then listing-item-breakable else listing-item in
+    let bblst = List.map (item-scheme ctx 0) itmzlst in
+    %% NOTE: block-skip 0pt を入れるとマージンが変わる
+    %% オリジナルの挙動を変えないために入れている
+    block-skip 0pt +++ (block-nil +++> bblst) +++ block-skip 0pt
+
+  %%
+  %% enumerate
+  %%
+
+  let-rec enumerate-item : int -> context -> int -> itemize -> block-boxes
+    | index ctx depth (Item(parent, _)) =
+      let color = get-text-color ctx in
+      let parent-indent = item-indent *' (float depth) in
+      let ib-index =
+        let it-num = (embed-string (arabic index)) in
+          read-inline ctx {(#it-num;)\ }
+      in
+      let index-width = get-natural-width ib-index in
+      let ib-parent =
+        embed-block-top ctx ((get-text-width ctx) -' parent-indent -' index-width) (fun ctx ->
+          form-paragraph (ctx |> set-paragraph-margin item-gap item-gap)
+            (read-inline ctx parent ++ inline-fil)
+        )
+      in
+      form-paragraph (ctx |> set-paragraph-margin item-gap item-gap)
+        ((inline-skip parent-indent) ++ ib-index ++ ib-parent)
+
+  let enumerate-scheme ctx (Item(_, itmzlst)) =
+    let bblst = List.mapi (fun i -> enumerate-item (i + 1) ctx 0) itmzlst in
+    block-nil +++> bblst
+
+end

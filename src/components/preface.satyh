@@ -1,0 +1,24 @@
+@import: ../config
+@import: ../lib/context
+
+module Preface : sig
+
+  val scheme : context -> block-text -> block-boxes
+
+end = struct
+
+  let scheme ctx inner =
+    let ctx-title =
+      ctx
+      |> Context.set-font Config.font-cjk-gothic-bold
+      |> set-font-size 24pt
+      |> set-paragraph-margin 30pt 30pt
+    in
+    let bb-title =
+      inline-fil ++ read-inline ctx-title {はじめに}
+      |> line-break false false ctx-title
+    in
+    let bb-inner = read-block ctx inner in
+    bb-title +++ bb-inner +++ block-skip 30pt
+
+end

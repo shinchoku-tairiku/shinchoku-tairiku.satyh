@@ -1,0 +1,23 @@
+@import: label
+
+module RefPage : sig
+
+  %% returns page-number (as a string)
+  val get : label -> string
+  val set : label -> int -> unit
+
+end = struct
+
+  let make-key label =
+    `ref-page:key:` ^ label
+
+  let get label =
+    match make-key label |> get-cross-reference with
+    | None -> `?`
+    | Some n -> n
+
+  let set label pnum =
+    let key = make-key label in
+    arabic pnum |> register-cross-reference key
+
+end

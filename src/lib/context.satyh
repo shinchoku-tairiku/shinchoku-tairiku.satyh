@@ -1,4 +1,4 @@
-@import: util
+@import: font
 
 module Context : sig
 
@@ -20,6 +20,5 @@ end = struct
     ctx
     |> set-cjk-font font
     |> set-latin-font font
-    |> set-font OtherScript font
 
 end

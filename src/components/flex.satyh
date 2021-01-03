@@ -1,0 +1,37 @@
+@require: list
+
+type flex-align =
+  | Start
+  | End
+  | Center
+  | SpaceBetween
+  | SpaceEvenly
+
+module Flex : sig
+
+  val inline-scheme : context -> flex-align -> inline-text list -> block-boxes
+
+end = struct
+
+  let inline-join start endd delim ibs =
+    let-rec f l =
+      match l with
+      | [] -> inline-nil
+      | [x] -> x
+      | x :: xs -> x ++ delim ++ f xs
+    in
+    start ++ f ibs ++ endd
+
+  let inline-scheme ctx align its =
+    let ibs = List.map (read-inline ctx) its in
+    let ib =
+      match align with
+      | Start -> inline-join inline-nil inline-fil inline-nil ibs
+      | End -> inline-join inline-fil inline-nil inline-nil ibs
+      | Center -> inline-join inline-fil inline-fil inline-nil ibs
+      | SpaceBetween -> inline-join inline-nil inline-nil inline-fil ibs
+      | SpaceEvenly -> inline-join inline-fil inline-fil inline-fil ibs
+    in
+    line-break true true ctx ib
+
+end
