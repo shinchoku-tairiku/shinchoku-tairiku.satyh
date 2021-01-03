@@ -25,6 +25,8 @@ module ShinchokuTairiku : sig
   direct \code : [string] inline-cmd
   direct \line-break : [] inline-cmd
   direct \ref : [label] inline-cmd
+  direct \listing : [bool?; itemize] inline-cmd
+  direct \enumerate : [itemize] inline-cmd
 
   direct +chapter : [label?; (label * bib-item) list?; inline-text; inline-text; block-text] block-cmd
   direct +section : [label?; inline-text; block-text] block-cmd
@@ -38,6 +40,8 @@ module ShinchokuTairiku : sig
   direct +proof : [inline-text?; block-text] block-cmd
   direct +column : [inline-text; block-text] block-cmd
   direct +row : [flex-align?; inline-text list] block-cmd
+  direct +listing : [bool?; itemize] block-cmd
+  direct +enumerate : [itemize] block-cmd
 
 end = struct
 
@@ -149,6 +153,23 @@ end = struct
     |> read-inline ctx
     |> Link.to label
 
+  let-inline ctx \listing ?:breakopt item =
+    let break = Option.from false breakopt in
+    let ib =
+      Itemize.listing-scheme ctx break item
+      |> embed-block-breakable ctx
+    in
+    inline-fil ++ ib
+
+  let-inline ctx \enumerate item =
+    %% NOTE: block-skip 0pt を入れるとマージンが変わる
+    %% オリジナルの挙動を変えないために入れている
+    let ib =
+      block-skip 0pt +++ Itemize.enumerate-scheme ctx item +++ block-skip 0pt
+      |> embed-block-breakable ctx
+    in
+    inline-fil ++ ib
+
   %%
   %% block commands
   %%
@@ -234,6 +255,13 @@ end = struct
   let-block ctx +row ?:alignopt its =
     let align = Option.from SpaceEvenly alignopt in
     Flex.inline-scheme ctx align its
+
+  let-block ctx +listing ?:breakopt item =
+    let break = Option.from false breakopt in
+    Itemize.listing-scheme ctx break item
+
+  let-block ctx +enumerate item =
+    Itemize.enumerate-scheme ctx item
 
 end
 
