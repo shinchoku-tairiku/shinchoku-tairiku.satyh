@@ -12,7 +12,7 @@ homepage: "https://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh"
 dev-repo: "git+https://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh.git"
 bug-reports: "https://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh/issues"
 depends: [
-  "satysfi" { >= "0.0.5" & < "0.0.6" }
+  "satysfi" { >= "0.0.5" }
   "satyrographos" { >= "0.0.2.6" & < "0.0.3" }
 
   "satysfi-dist"
