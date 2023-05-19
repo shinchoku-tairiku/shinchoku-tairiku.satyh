@@ -39,9 +39,10 @@ module Config : sig
 
 end = struct
 
-  %% B5正寸サイズ + 裁ち落とし
-  let page-width    = 188mm
-  let page-height   = 263mm
+  %% B5-Japan正寸サイズ
+  let page-width    = 182mm
+  let page-height   = 257mm
+
   %% size / position
   let page-width    = page-width
   let page-height   = page-height
