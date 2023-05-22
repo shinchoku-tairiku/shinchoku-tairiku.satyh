@@ -11,6 +11,11 @@
 
 opam と Satyrographos でインストールできます。satyrographos-repo にはアップロードされていません。
 
+紙面のサイズは`B5-Japan`になります。  
+現状、`master`ブランチは更に裁ち落とし付き(全辺+3mm)。`master+no-offset`ブランチは裁ち落としが無い設定になっています。
+
+(TODO: ブランチではなくパラメータで設定できるようにする。)
+
 ```
 git clone git://github.com/shinchoku-tairiku/shinchoku-tairiku.satyh
 cd shinchoku-tairiku.satyh
